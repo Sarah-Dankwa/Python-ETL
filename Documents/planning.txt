@@ -1,0 +1,30 @@
+Moving OLTP data into a data warehouse for OLAP
+
+Data Ingestion
+1.	Python application (lambda)
+2.	S3 ingested data bucket
+3.	Data
+4.	Cloudwatch logs
+5.	IAM policies
+6.	Email alerts (cloudwatch)
+7.	Eventbridge
+8.	Step functions
+
+
+Processed/tranformed data
+1.	Python application to transform data (lambda)
+2.	S3 ingested data bucket
+3.	Data
+4.	Cloudwatch logs
+5.	IAM policies
+6.	Email alerts (cloudwatch)
+7.	Eventbridge
+8.	Step functions
+
+Data Warehouse
+1.	Python application schedule update of data warehouse (lambda)
+2.	Email alerts
+
+Visualiations 
+
+
