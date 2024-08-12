@@ -7,10 +7,14 @@ Data Ingestion
 •	11 tables in database 
 •	Credentials to access database stored on secrets manager and accessed by lambda
 
+Set up terraform IAMS for Lambda RDS - S3
+Create an IAMS policy for lambda with the following permissions attached:
+•	Read from RDS
+
 
 2.	Python application (lambda) – access database to pull data into s3
 •	Created by terraform
-•	IAM roles for cloudwatch, s3, AWS secrets manager, eventbridge
+•	IAM roles for cloudwatch, s3, AWS secrets manager, eventbridge, rds
 •	Possible layer?
 •	Fetch only the latest data (delta) – needs to determine the difference between delta and full fetch data
 •	Lambda1 to do a full fetch and Lambda2 to ingest the delta data or one lambda to do both
@@ -31,6 +35,7 @@ Data Ingestion
 •	Folder system based on dates/times and table name
 •	Created in terraform
 •	Possibly saved in parquet format
+
 
 
 6.	Eventbridge
@@ -82,7 +87,20 @@ Data Processing
 •	Lambda will be run via step functions
 •	IAM permissions
 
-8. Visualisation
-• display some of the data in an application that can read data in real-time from the warehouse
-• expand later 
 
+Data warehousing
+1.	Data
+•	Data will be loaded into our predefined data warehouse
+•	Credentials to access database stored on secrets manager and accessed by lambda
+
+2.	Lambda function
+•	Created by terraform
+•	IAM permission to read and write to s3, cloudwatch, secrete, eventbridge, rds,step functions
+•	Load data from s3 into database
+•	Log statuses to cloudwatch
+•	Email alerts for major errors!
+
+3.	Eventbridge
+•	Schedule lambda to run at set intervals
+
+4.	Step functions

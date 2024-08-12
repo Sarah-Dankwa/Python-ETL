@@ -1,5 +1,180 @@
-1. Ingest given database(11 tables) using 
+Data Ingestion
+
+1.	Data
+•	11 tables in database 
+•	Credentials to access database stored on secrets manager and accessed by lambda
+
+Set up terraform IAMS for Lambda RDS - S3
+Create an IAMS policy for lambda with the following permissions attached:
+•	Read from RDS
+
+
+2.	Python application (lambda) – access database to pull data into s3
+•	Created by terraform
+•	IAM roles for cloudwatch, s3, AWS secrets manager, eventbridge, rds
+•	Possible layer?
+•	Fetch only the latest data (delta) – needs to determine the difference between delta and full fetch data
+•	Lambda1 to do a full fetch and Lambda2 to ingest the delta data or one lambda to do both
+•	Use a logger to log status and potential error messages to cloudwatch via email
+•	Best format to save data in (parquet, csv, json?)
+
+3.	Cloudwatch logs
+•	IAM roles to allow lambda to write to cloudwatch 
+•	Use logger.info() to write meaningful outputs to cloudwatch
+
+
+4.	Major errors handling
+•	Major errors will be logged to an email alert
+•	SNS topic, subscription, metric filter
+•	Set up using terraform 
+
+5.	S3 ingested data bucket
+•	Folder system based on dates/times and table name
+•	Created in terraform
+•	Possibly saved in parquet format
+
+
+
+6.	Eventbridge
+•	IAM permissions to invoke step function which will invoke the lambda
+•	Created via terraform
+•	Schedular to run lambda every 15 minutes – should request retries
+
+7.	Step Functions
+•	Lambda will be run via step functions
+•	IAM permissions
+
+
+Data Processing
+
+1.	Data remodelling 
+•	Use pandas to clean data – changing/checking datatypes, dealing with nulls etc
+•	Insert data in facts and dimension tables
+
+2.	Python application – lambda 
+•	Created in terraform
+•	May be pandas layer
+•	IAM permission to read and write to s3, cloudwatch, eventbridge, step functions
+•	Read from s3 ingestion store, apply data cleaning techniques, store as parquet in s3 processed data store
+•	Create fact and dimension tables
+•	Insert data from s3 processed data store into new tables
+•	Use a logger to log status and potential error messages to cloudwatch via email
+
+3.	Cloudwatch logs
+•	IAM roles to allow lambda to write to cloudwatch 
+•	Use logger.info() to write meaningful outputs to cloudwatch
+
+
+4.	Major errors handling
+•	Major errors will be logged to an email alert
+•	SNS topic, subscription, metric filter
+•	Set up using terraform 
+
+5.	S3 processed data bucket
+•	Folder system based on dates/times and table name
+•	Created in terraform
+•	Saved in parquet format
+
+6.	Eventbridge
+•	IAM permissioms to invoke lambda
+•	Created via terraform
+•	Schedular to run lambda every 15 minutes – should request retries
+
+7.	Step Functions
+•	Lambda will be run via step functions
+•	IAM permissions
+
+
+Data warehousing
+1.	Data
+•	Data will be loaded into our predefined data warehouse
+•	Credentials to access database stored on secrets manager and accessed by lambda
+
+2.	Lambda function
+•	Created by terraform
+•	IAM permission to read and write to s3, cloudwatch, secrete, eventbridge, rds,step functions
+•	Load data from s3 into database
+•	Log statuses to cloudwatch
+•	Email alerts for major errors!
+
+3.	Eventbridge
+•	Schedule lambda to run at set intervals
+
+4.	Step functions
+
+
 
 1.	Data Ingestion Tickets
 •	AWS set up and database credentials
-•	Set up terraform file structure
+•	Set up project file structure in VSCode
+•	Set up terraform file structure in terraform folder within project
+•	Set up terraform IAMS for lambda
+	Read and write to s3 
+	 Cloudwatch logs and alerts
+	 Eventbridge schedular 
+	Read from secrets for database 
+•	Set up terraform S3 ingestion store
+•	Set up terraform lambda
+•	Set up terraform SNS topics for email alerts
+•	Set up terraform eventbridge schedular 
+	Dependency: Set up eventbridge in console first
+•	Set up terraform step function
+	Dependency: Set up step function in console first
+•	Set up terraform IAMS for eventbridge to invoke stepfunction 
+•	Set up terraform IAMS for stepfunction to invoke lambda
+•	Set up terraform IAMS for cloudwatch to send emails via SNS topics
+•	Lambda function:
+	Full fetch from database
+	Conditional logic to fetch delta data from database 
+	Data must be organised in folders based on table names and timestamps
+	Data stored in parquet format
+	Logging to cloudwatch
+	Error handling  
+
+
+
+
+2.	Data Transformation/processing
+•	Set up terraform IAMS for lambda
+	Read and write to s3 
+	 Cloudwatch logs and alerts
+	 Eventbridge schedular 
+•	       Set up terraform S3 processed data store
+•	Set up terraform lambda
+•	Set up terraform SNS topics for email alerts
+•	Set up terraform eventbridge schedular 
+	Dependency: Set up eventbridge in console first
+•	Set up terraform step function
+	Dependency: Set up step function in console first
+•	Set up terraform IAMS for eventbridge to invoke stepfunction ??
+•	Set up S3 trigger for lambda??
+•	Set up terraform IAMS for stepfunction to invoke lambda??
+•	Set up terraform IAMS for cloudwatch to send emails via SNS topics
+•	Lambda function:
+	Possible data cleaning using pandas
+	Create facts and dimensions tables
+	Insert into facts and dimensions tables
+	Data stored in parquet format
+	Logging to cloudwatch
+	Error handling  
+
+
+3.	Data Warehousing/loading
+•	Set up terraform IAMS for lambda
+	Read from s3 
+	Write to RDS?
+	 Cloudwatch logs and alerts
+	 Eventbridge schedular 
+•	       Set up terraform S3 processed data store
+•	Set up terraform lambda
+•	Set up terraform SNS topics for email alerts
+•	Set up terraform IAMS for cloudwatch to send emails via SNS topics
+•	Lambda function:
+	Data stored in parquet format
+	Data loaded from s3 into RDS
+	Logging to cloudwatch
+	Error handling  
+
+
+
+4.	Visualisations
