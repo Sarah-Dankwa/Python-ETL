@@ -12,29 +12,33 @@ Project Repo
 ##########PROJECT STRUCTURE##########
 
 GitHub/workflow/
-	-deploy.yml
+- deploy.yml
 
 src/
-	-lambda1.py
-	-lambda2……
+- lambda1.py
+- lambda2……
+  
 test/
-	-testfile1.py
-	-testfile2.py
-	-……etc
+- testfile1.py
+- testfile2.py
+- ……etc
+
 terraform/
-	-IAM
-	-s3
-	-main
-	-stepfunction
-	-logger
-	-….. etc
+- IAM
+- s3
+- main
+- stepfunction
+- logger
+- ….. etc
 
 .gitignore
+
 README.md
+
 MAKEFILE
 
 DOCUMENTS/
-	-useful files for design / understanding
+- useful files for design / understanding
 
 
 #############DAILY SETUP################
@@ -48,13 +52,14 @@ Credentials will be shared by AWS user with shared account
 
 
 Makefile
-	-make requirements (only once or when pip list updated)
-	-make dev setup
-	-make run-checks
+- make requirements (only once or when pip list updated)
+- make dev setup
+- make run-checks
 
 Ensure venv is active and python path exported
-	source venv/bin/activate
-	export PYTHONPATH=$(pwd)
+- source venv/bin/activate
+- export PYTHONPATH=$(pwd)
+
 
 END OF DAY: Terraform destroy!
 
@@ -62,6 +67,7 @@ END OF DAY: Terraform destroy!
 #############TESTING##################
 
 Use of purest is required
+
 Where applicable AWS Moto mocking should be applied
 
 
