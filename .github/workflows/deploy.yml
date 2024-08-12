@@ -16,9 +16,15 @@ jobs:
           uses: actions/setup-python@v5
           with:
             python-version: '3.11.5'
+        - name: Run Requirements
+          run: make requirements
+        - name: Run Dev-Setup
+          run: make dev-setup
         - name: Run Tests
-          run: make all
-          
+          run: make run-checks
+
+
+
     deploy-lambda:
       name: deploy-lambda
       runs-on: ubuntu-latest
