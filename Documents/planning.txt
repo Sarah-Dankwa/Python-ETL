@@ -1,30 +1,86 @@
 Moving OLTP data into a data warehouse for OLAP
 
+
 Data Ingestion
-1.	Python application (lambda)
-2.	S3 ingested data bucket
-3.	Data
-4.	Cloudwatch logs
-5.	IAM policies
-6.	Email alerts (cloudwatch)
-7.	Eventbridge
-8.	Step functions
+
+1.	Data
+•	11 tables in database 
+•	Credentials to access database stored on secrets manager and accessed by lambda
 
 
-Processed/tranformed data
-1.	Python application to transform data (lambda)
-2.	S3 ingested data bucket
-3.	Data
-4.	Cloudwatch logs
-5.	IAM policies
-6.	Email alerts (cloudwatch)
-7.	Eventbridge
-8.	Step functions
+2.	Python application (lambda) – access database to pull data into s3
+•	Created by terraform
+•	IAM roles for cloudwatch, s3, AWS secrets manager, eventbridge
+•	Possible layer?
+•	Fetch only the latest data (delta) – needs to determine the difference between delta and full fetch data
+•	Lambda1 to do a full fetch and Lambda2 to ingest the delta data or one lambda to do both
+•	Use a logger to log status and potential error messages to cloudwatch via email
+•	Best format to save data in (parquet, csv, json?)
 
-Data Warehouse
-1.	Python application schedule update of data warehouse (lambda)
-2.	Email alerts
+3.	Cloudwatch logs
+•	IAM roles to allow lambda to write to cloudwatch 
+•	Use logger.info() to write meaningful outputs to cloudwatch
 
-Visualiations 
+
+4.	Major errors handling
+•	Major errors will be logged to an email alert
+•	SNS topic, subscription, metric filter
+•	Set up using terraform 
+
+5.	S3 ingested data bucket
+•	Folder system based on dates/times and table name
+•	Created in terraform
+•	Possibly saved in parquet format
+
+
+
+6.	Eventbridge
+•	IAM permissions to invoke step function which will invoke the lambda
+•	Created via terraform
+•	Schedular to run lambda every 15 minutes – should request retries
+
+7.	Step Functions
+•	Lambda will be run via step functions
+•	IAM permissions
+
+
+Data Processing
+
+1.	Data remodelling 
+•	Use pandas to clean data – changing/checking datatypes, dealing with nulls etc
+•	Insert data in facts and dimension tables
+
+2.	Python application – lambda 
+•	Created in terraform
+•	May be pandas layer
+•	IAM permission to read and write to s3, cloudwatch, eventbridge, step functions
+•	Read from s3 ingestion store, apply data cleaning techniques, store as parquet in s3 processed data store
+•	Create fact and dimension tables
+•	Insert data from s3 processed data store into new tables
+•	Use a logger to log status and potential error messages to cloudwatch via email
+
+3.	Cloudwatch logs
+•	IAM roles to allow lambda to write to cloudwatch 
+•	Use logger.info() to write meaningful outputs to cloudwatch
+
+
+4.	Major errors handling
+•	Major errors will be logged to an email alert
+•	SNS topic, subscription, metric filter
+•	Set up using terraform 
+
+5.	S3 processed data bucket
+•	Folder system based on dates/times and table name
+•	Created in terraform
+•	Saved in parquet format
+
+6.	Eventbridge
+•	IAM permissioms to invoke lambda
+•	Created via terraform
+•	Schedular to run lambda every 15 minutes – should request retries
+
+7.	Step Functions
+•	Lambda will be run via step functions
+•	IAM permissions
 
 
