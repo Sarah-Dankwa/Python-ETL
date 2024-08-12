@@ -33,7 +33,6 @@ Data Ingestion
 •	Possibly saved in parquet format
 
 
-
 6.	Eventbridge
 •	IAM permissions to invoke step function which will invoke the lambda
 •	Created via terraform

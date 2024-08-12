@@ -1,5 +1,5 @@
 1. Ingest given database(11 tables) using 
 
-1.	Data
-•	11 tables in database 
-•	Credentials to access database stored on secrets manager and accessed by lambda
+1.	Data Ingestion Tickets
+•	AWS set up and database credentials
+•	Set up terraform file structure
