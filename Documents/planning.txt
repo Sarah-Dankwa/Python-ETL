@@ -83,4 +83,7 @@ Data Processing
 •	Lambda will be run via step functions
 •	IAM permissions
 
+8. Visualisation
+• display some of the data in an application that can read data in real-time from the warehouse
+• expand later 
 
