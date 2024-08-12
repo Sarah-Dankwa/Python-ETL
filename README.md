@@ -17,12 +17,10 @@ GitHub/workflow/
 src/
 - lambda1.py
 - lambda2……
-  
 test/
 - testfile1.py
 - testfile2.py
 - ……etc
-
 terraform/
 - IAM
 - s3
