@@ -86,5 +86,5 @@ check-coverage:
 	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} coverage run --omit 'venv/*' -m pytest && coverage report -m)
 
 ## Run all checks
-run-checks:  run-black unit-test check-coverage
-## security-test
+run-checks:  run-black security-test unit-test check-coverage
+## 
