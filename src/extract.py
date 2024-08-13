@@ -2,6 +2,9 @@ from pg8000.native import Connection, identifier
 from botocore.exceptions import ClientError
 import boto3
 import json
+import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 
 def get_database_credentials():
@@ -26,7 +29,7 @@ def connect_to_db():
         database=secret["Database"],
         password=secret["Password"],
         host=secret["Hostname"],
-        port=secret["Port"],
+        port=secret["Port"]
     )
 
 
@@ -40,6 +43,14 @@ def get_single_table(table_name):
     return final
 
 
+def convert_to_parquet(result, filename):
+    df = pd.DataFrame(result)
+    df.to_parquet(filename, index=False)
+
+result = get_single_table('payment_type')
+convert_to_parquet(result)
+
+
 def full_fetch():
     # list of table names
     # for each table
@@ -48,3 +59,7 @@ def full_fetch():
     # get timestamp
     # save to s3 on timestamp / tablename
     pass
+
+# all tables 
+# SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
+
