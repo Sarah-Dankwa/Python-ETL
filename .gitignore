@@ -20,4 +20,4 @@ terraform/init.sh
 zen.txt
 *.tfstate*
 dependencies/
-# packages/
+packages/
