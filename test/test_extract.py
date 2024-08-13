@@ -1,37 +1,28 @@
 import pytest
-import boto3
-from moto import mock_aws
-import os
-from src.extract import connect_to_db, full_fetch, get_database_credentials
+from pg8000.native import Connection
+from src.extract import (
+    connect_to_db,
+    get_single_table,
+)
 
-
-@pytest.fixture(scope="function")
-def aws_credentials():
-    os.environ["AWS_ACCESS_KEY_ID"] = "testing"
-    os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
-    os.environ["AWS_SECURITY_TOKEN"] = "testing"
-    os.environ["AWS_SESSION_TOKEN"] = "testing"
-    os.environ["AWS_DEFAULT_REGION"] = "eu-west-2"
-
-@pytest.fixture(scope='function')
-def secretsmanager_client(aws_credentials):
-    with mock_aws():
-        yield boto3.client('secretsmanager', region_name='eu-west-2')
 
 class TestDatabaseCredsAndConnection:
-    def test_get_database_credentials(self, secretsmanager_client):
-        secretsmanager_client.create_secret(
-            Name="totesys-database",
-            SecretString='{"key": "value2"}'
-        )
-        
-        response = get_database_credentials()
-        assert response == {"key": "value2"}
-
-
+    @pytest.mark.it("Test db connection connects to database")
     def test_connection_to_db(self):
-        pass
+        db = connect_to_db()
+        assert isinstance(db, Connection)
+
+
+class TestGetSingleTable:
+    @pytest.mark.it("Test returns correct keys for payment type table")
+    def test_returns_expected_keys(self):
+        results = get_single_table("payment_type")
+        assert "payment_type_id" in results[0]
+        assert "payment_type_name" in results[0]
+        assert "created_at" in results[0]
+        assert "last_updated" in results[0]
+
 
 class TestFullFetch:
-    
+
     pass
