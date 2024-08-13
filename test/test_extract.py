@@ -3,6 +3,8 @@ from pg8000.native import Connection
 from src.extract import (
     connect_to_db,
     get_single_table,
+    get_table_names,
+    get_last_updated
 )
 
 
@@ -23,6 +25,26 @@ class TestGetSingleTable:
         assert "last_updated" in results[0]
 
 
-class TestFullFetch:
+class TestGetTableNames:
+    def test_table_names_gets_list_of_table_names(self):
+        expected = [
+            'address',
+            'staff', 
+            'payment',
+            'department', 
+            'transaction',
+            'currency', 
+            'payment_type',
+            'sales_order', 
+            'counterparty',
+            'purchase_order',
+            'design'
+        ]
+        assert get_table_names() == expected
 
+
+class TestGetLastUpdated:
+    pass
+
+class TestFullFetch:
     pass

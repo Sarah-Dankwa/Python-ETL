@@ -5,7 +5,18 @@ import json
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
+import os
+from datetime import datetime
 
+
+# BUCKET_NAME = os.environ['BUCKET_NAME']
+BUCKET_NAME = 'sarah-jessica-test-bucket'
+now = datetime.now()
+year = now.strftime('%Y')
+month = now.strftime('%m')
+day = now.strftime('%d')
+time = now.strftime('%H:%M:%S')
+print(str(now)[:-3])
 
 def get_database_credentials():
     secret_name = "totesys-database"
@@ -47,19 +58,49 @@ def convert_to_parquet(result, filename):
     df = pd.DataFrame(result)
     df.to_parquet(filename, index=False)
 
-result = get_single_table('payment_type')
-convert_to_parquet(result)
+
+def get_table_names():
+    query = """
+    SELECT table_name 
+    FROM information_schema.tables 
+    WHERE table_schema = 'public';"""
+    db = connect_to_db()
+    results = db.run(query)
+    table_names = [row[0] for row in results if row != ['_prisma_migrations']]
+    db.close()
+    return table_names
+
+def save_datetime_parameter():
+    client = boto3.client("ssm")
+    client.put_parameter(
+        Name='latest-extract',
+        Value=str(now)[:-3],
+        Overwrite=True
+    )
+
+
+def retrieve_datetime_parameter():
+    client = boto3.client("ssm")
+    client.get_parameter(
+        Name='latest-extract'
+    )
 
 
 def full_fetch():
-    # list of table names
-    # for each table
-    # run get_single table
-    # convert to parquet
-    # get timestamp
-    # save to s3 on timestamp / tablename
-    pass
+    bucket_name = BUCKET_NAME
+    client = boto3.client('s3')
+    table_names = get_table_names()
 
-# all tables 
-# SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
+    for name in table_names:
+        single_table = get_single_table(name)
+        filename = f'{name}.parquet'
+        key = name + '/' + year + '/' + month + '/' + day + '/' + time + '/' + name + '.parquet'
+        convert_to_parquet(single_table, filename)
+        client.upload_file(
+            filename, bucket_name, key
+        )
+
+
+def lambda_handler(event, context):
+    pass
 
