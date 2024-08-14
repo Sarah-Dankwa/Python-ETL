@@ -27,6 +27,7 @@ resource "aws_cloudwatch_metric_alarm" "extract_metric_alarm" {
   statistic                 = "Sum"
   threshold                 = 1
   alarm_description         = "This metric monitors ERROR in loggroup"
+  alarm_actions             = ["${resource.aws_sns_topic.extract_metric_alarm_updates.arn}"]
   insufficient_data_actions = []
 }
 
@@ -39,7 +40,7 @@ resource "aws_sns_topic" "extract_metric_alarm_updates" {
 
 //Create a SNS topic subscription
 resource "aws_sns_topic_subscription" "extract_metric_alarm_email_target" {
-  for_each  = toset(["mohan0501@gmail.com", "beveridgerr@gmail.com"])
+  for_each  = toset(["mohan0501@gmail.com", "beveridgerr@gmail.com", "jess.marcell@gmail.com", "sarah_dankwa@hotmail.co.uk", "hanawang346@gmail.com"])
   topic_arn = aws_sns_topic.extract_metric_alarm_updates.arn
   protocol  = "email"
   endpoint  = each.value
