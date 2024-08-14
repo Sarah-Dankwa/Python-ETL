@@ -16,7 +16,7 @@ year = now.strftime('%Y')
 month = now.strftime('%m')
 day = now.strftime('%d')
 time = now.strftime('%H:%M:%S')
-print(str(now)[:-3])
+# print(str(now)[:-3])
 
 def get_database_credentials():
     secret_name = "totesys-database"
@@ -70,22 +70,25 @@ def get_table_names():
     db.close()
     return table_names
 
-def save_datetime_parameter():
+def save_datetime_parameter(now):
     client = boto3.client("ssm")
     client.put_parameter(
         Name='latest-extract',
-        Value=str(now)[:-3],
+        Type = 'String',
+        Value=now,
         Overwrite=True
     )
 
-
 def retrieve_datetime_parameter():
     client = boto3.client("ssm")
-    client.get_parameter(
-        Name='latest-extract'
+    extract_datetime=client.get_parameter(
+        Name='latest'
     )
+    return extract_datetime['Parameter']['Value']
 
 
+
+retrieve_datetime_parameter()
 def full_fetch():
     bucket_name = BUCKET_NAME
     client = boto3.client('s3')
@@ -101,6 +104,24 @@ def full_fetch():
         )
 
 
+
 def lambda_handler(event, context):
+
+   # set a parameter value date in the console to be in the past ie. 2000
+   # check whether the bucket has been updated since this date 
+   # if it has then put/overwrite the date parameter
+   # parse that as a parameter to the get single table function
+    # WHERE lastest_update .... paramenter value
+  
+
+  
+  
+    # fetch
+    # change paramter value to datetime.now()
+
+    # check latest update date where > new paramter value
+
+    #
     pass
+
 
