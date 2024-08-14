@@ -251,6 +251,7 @@ resource "aws_iam_policy" "eventbridge_step_function_policy" {
 resource "aws_iam_role_policy_attachment" "eventbridge_step_function_policy_attachment" {
   role       = aws_iam_role.event_bridge_role.name
   policy_arn = aws_iam_policy.eventbridge_step_function_policy.arn
+
 }
 
 data "aws_iam_policy_document" "ssm_policy_document" {
@@ -276,4 +277,5 @@ resource "aws_iam_role_policy_attachment" "ssm_attachement" {
     role = aws_iam_role.lambda_role.name
     policy_arn = aws_iam_policy.ssm_policy.arn
   
+
 }
