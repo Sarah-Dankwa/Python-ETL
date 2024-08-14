@@ -251,4 +251,31 @@ resource "aws_iam_policy" "eventbridge_step_function_policy" {
 resource "aws_iam_role_policy_attachment" "eventbridge_step_function_policy_attachment" {
   role       = aws_iam_role.event_bridge_role.name
   policy_arn = aws_iam_policy.eventbridge_step_function_policy.arn
+
+}
+
+data "aws_iam_policy_document" "ssm_policy_document" {
+	statement {
+		actions = [
+			"ssm:GetParameter",
+            "ssm:PutParamater"
+		]
+		resources = [
+			"arn:aws:ssm:eu-west-2:590183674561:parameter/latest-extract"
+		]
+	}
+}
+
+//Create the IAM policy using the ssm policy document
+resource "aws_iam_policy" "ssm_policy" {
+    name_prefix = "ssm-${var.extract_lambda}"
+    policy = data.aws_iam_policy_document.ssm_policy_document.json
+}
+
+# Attach the SSM Policy to the lambda Role
+resource "aws_iam_role_policy_attachment" "ssm_attachement" {
+    role = aws_iam_role.lambda_role.name
+    policy_arn = aws_iam_policy.ssm_policy.arn
+  
+
 }
