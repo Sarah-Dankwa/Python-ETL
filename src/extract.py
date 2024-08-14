@@ -1,4 +1,4 @@
-from pg8000.native import Connection, identifier
+from pg8000.native import Connection, identifier, literal
 from botocore.exceptions import ClientError
 import boto3
 import json
@@ -44,9 +44,15 @@ def connect_to_db():
     )
 
 
-def get_single_table(table_name):
+def get_single_table(table_name, fetch_date=None):
     db = connect_to_db()
-    query = f"SELECT * FROM {identifier(table_name)};"
+    query = f"SELECT * FROM {identifier(table_name)}"
+
+    if fetch_date:
+        query += f" WHERE last_updated between {literal(fetch_date)} and {literal(str(now))};"
+        # may have to determine difference between using idientifer or literal for fetch data &/or now variables
+    
+    
     results = db.run(query)
     columns = [col["name"] for col in db.columns]
     final = [dict(zip(columns, payment_type)) for payment_type in results]
@@ -75,53 +81,68 @@ def save_datetime_parameter(now):
     client.put_parameter(
         Name='latest-extract',
         Type = 'String',
-        Value=now,
+        Value=str(now),
         Overwrite=True
     )
 
 def retrieve_datetime_parameter():
     client = boto3.client("ssm")
     extract_datetime=client.get_parameter(
-        Name='latest'
+        Name='latest-extract'
     )
     return extract_datetime['Parameter']['Value']
 
+def list_bucket_objects():
+    client = boto3.client('s3')
+    bucket_objects = client.list_objects_v2(
+        Bucket=BUCKET_NAME
+    )
+    return bucket_objects['KeyCount']
+   
 
 
-retrieve_datetime_parameter()
-def full_fetch():
+def full_fetch(fetch_date=None):
     bucket_name = BUCKET_NAME
     client = boto3.client('s3')
     table_names = get_table_names()
 
     for name in table_names:
-        single_table = get_single_table(name)
-        filename = f'{name}.parquet'
-        key = name + '/' + year + '/' + month + '/' + day + '/' + time + '/' + name + '.parquet'
-        convert_to_parquet(single_table, filename)
-        client.upload_file(
-            filename, bucket_name, key
-        )
+        single_table = get_single_table(name,fetch_date)
+
+        if single_table:
+            filename = f'{name}.parquet'
+            key = name + '/' + year + '/' + month + '/' + day + '/' + time + '/' + name + '.parquet'
+
+            convert_to_parquet(single_table, filename)
+
+            client.upload_file(
+                filename, bucket_name, key
+            )
 
 
 
-def lambda_handler(event, context):
 
-   # set a parameter value date in the console to be in the past ie. 2000
-   # check whether the bucket has been updated since this date 
-   # if it has then put/overwrite the date parameter
-   # parse that as a parameter to the get single table function
-    # WHERE lastest_update .... paramenter value
-  
+def lambda_handler(event=None, context=None):
 
-  
-  
-    # fetch
-    # change paramter value to datetime.now()
+    object_count = list_bucket_objects()
 
-    # check latest update date where > new paramter value
+    if object_count > 0:
+        last_fetch_datetime = retrieve_datetime_parameter()
+        full_fetch(last_fetch_datetime)
+    else:
+        full_fetch()
 
-    #
-    pass
+    save_datetime_parameter(now)
+
+
+lambda_handler()
+
+
+ 
+ 
+
+
+
+
 
 
