@@ -8,7 +8,7 @@ variable "transform_lambda" {
   default = "transform"
 }
 
-variable "load_lambda" {
+variable "state_machine_name" {
   type    = string
-  default = "load"
+  default = "totesys-workflow-"
 }
