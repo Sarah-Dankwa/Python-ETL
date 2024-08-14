@@ -120,8 +120,11 @@ def full_fetch(fetch_date=None):
     client = boto3.client('s3')
     table_names = get_table_names()
 
+
+
     for name in table_names:
         single_table = get_single_table(name,fetch_date)
+
 
         if single_table:
             filename = f'{name}.parquet'
@@ -129,7 +132,7 @@ def full_fetch(fetch_date=None):
 
             convert_to_parquet(single_table, filename)
 
-            result = client.upload_file(
+            client.upload_file(
                 filename, bucket_name, key
             )
             logger.info(f"{name} files added to s3 bucket")
@@ -139,6 +142,9 @@ def full_fetch(fetch_date=None):
 
 
 def lambda_handler(event=None, context=None):
+
+    if not connect_to_db():
+        logger.error("NO CONNECTION TO DATABASE - PLEASE CHECK")
 
     object_count = list_bucket_objects()
 
@@ -151,13 +157,13 @@ def lambda_handler(event=None, context=None):
     else:
         full_fetch()
         logger.info("Full fetch of files from database")
+        
 
     
 
     save_datetime_parameter(now)
 
 
-lambda_handler()
 
 
  
