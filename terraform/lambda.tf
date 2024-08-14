@@ -41,6 +41,14 @@ resource "aws_lambda_function" "workflow_tasks_extract" {
       KEY_NAME = "ingested_data"
     } 
   }
+
+  logging_config {
+    log_format = "JSON"
+    log_group = aws_cloudwatch_log_group.alapin_extract_log_group.name
+    application_log_level = "INFO"
+    system_log_level = "DEBUG"
+
+  }
 }
 
 resource "aws_lambda_function" "workflow_tasks_transform" {
@@ -61,6 +69,14 @@ resource "aws_lambda_function" "workflow_tasks_transform" {
       KEY_NAME = "processed_data"
     } 
   }
+
+   logging_config {
+    log_format = "JSON"
+    log_group = aws_cloudwatch_log_group.alapin_extract_log_group.name
+    application_log_level = "INFO"
+    system_log_level = "DEBUG"
+
+  }
 }
 
 resource "aws_lambda_function" "workflow_tasks_load" {
@@ -79,6 +95,14 @@ resource "aws_lambda_function" "workflow_tasks_load" {
     variables = {
       DATA_PROCESSED_BUCKET_NAME = aws_s3_bucket.processed_data_bucket.id
     } 
+  }
+
+   logging_config {
+    log_format = "JSON"
+    log_group = aws_cloudwatch_log_group.alapin_extract_log_group.name
+    application_log_level = "INFO"
+    system_log_level = "DEBUG"
+
   }
 
 }
