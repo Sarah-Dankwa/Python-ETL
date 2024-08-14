@@ -260,11 +260,10 @@ data "aws_iam_policy_document" "ssm_policy_document" {
             "ssm:PutParamater"
 		]
 		resources = [
-			aws_ssm_parameter.latest-extract.name
+			"arn:aws:ssm:eu-west-2:590183674561:parameter/latest-extract"
 		]
 	}
 }
-
 
 //Create the IAM policy using the ssm policy document
 resource "aws_iam_policy" "ssm_policy" {
