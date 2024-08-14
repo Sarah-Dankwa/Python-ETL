@@ -13,6 +13,12 @@ data "archive_file" "transform_lambda" {
   source_file = "${path.module}/../src/transform.py"
 }
 
+data "archive_file" "load_lambda" {
+  type        = "zip"
+  output_path = "${path.module}/../packages/load/function.zip"
+  source_file = "${path.module}/../src/load.py"
+}
+
 resource "aws_lambda_function" "workflow_tasks_extract" {
   function_name    = var.extract_lambda
   source_code_hash = data.archive_file.extract_lambda.output_base64sha256
@@ -30,7 +36,7 @@ resource "aws_lambda_function" "workflow_tasks_extract" {
   environment {
     variables = {
       DATA_INGESTED_BUCKET_NAME = aws_s3_bucket.ingested_data_bucket.id
-    #   DATA_PROCESSED_BUCKET_NAME = aws_s3_bucket.processed_data_bucket.id
+    # DATA_PROCESSED_BUCKET_NAME = aws_s3_bucket.processed_data_bucket.id
 
       KEY_NAME = "ingested_data"
     } 
@@ -55,4 +61,24 @@ resource "aws_lambda_function" "workflow_tasks_transform" {
       KEY_NAME = "processed_data"
     } 
   }
+}
+
+resource "aws_lambda_function" "workflow_tasks_load" {
+  function_name    = var.load_lambda
+  source_code_hash = data.archive_file.load_lambda.output_sha256
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "${var.load_lambda}.lambda_handler"
+  runtime          = "python3.12"
+
+  s3_bucket        = aws_s3_bucket.code_bucket.bucket
+  s3_key           = "${var.load_lambda}/function.zip"
+
+  depends_on = [aws_s3_object.lambda_code]
+
+  environment {
+    variables = {
+      DATA_PROCESSED_BUCKET_NAME = aws_s3_bucket.processed_data_bucket.id
+    } 
+  }
+
 }
