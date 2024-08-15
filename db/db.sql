@@ -1,0 +1,2 @@
+DROP DATABASE IF EXISTS test_rds;
+CREATE DATABASE test_rds;
