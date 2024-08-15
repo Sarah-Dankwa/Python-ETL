@@ -12,3 +12,8 @@ variable "load_lambda" {
   type    = string
   default = "load"
 }
+
+variable "state_machine_name" {
+  type    = string
+  default = "totesys-workflow-"
+}

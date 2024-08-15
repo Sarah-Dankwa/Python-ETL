@@ -42,7 +42,20 @@ logdirs:
 requirements: create-environment logdirs
 	$(call execute_in_env, $(PIP) install -r ./requirements.txt)
 
+## Set up dependencies/python directory and install specific packages
+custom-dependencies: create-environment logdirs
+	
+	@echo ">>> Setting up dependencies/python directory..."
+	mkdir -p dependencies/python
+	rm -rf dependencies/python/*
 
+	@echo ">>> Installing pandas to dependencies/python..."
+	$(call execute_in_env, $(PIP) install pandas -t dependencies/python --no-cache-dir)
+
+	@echo ">>> Installing pg8000 to dependencies/python..."
+	$(call execute_in_env, $(PIP) install pg8000 -t dependencies/python --no-cache-dir)
+
+all-requirements: requirements custom-dependencies
 ################################################################################################################
 # Set Up
 ## Install bandit
@@ -77,14 +90,29 @@ security-test:
 run-black:
 	$(call execute_in_env, black src test)
 
+## Run flake8
+run-flake8: dev-setup
+	$(call execute_in_env, flake8  ./src/*.py ./test/*.py)
+
 ## Run the unit tests
 unit-test:
-	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -vvv --testdox)
+	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -vvv \
+	--ignore=dependencies/python/ \
+	--testdox)
+
+## Run all tests including test_recorder.py, test_import.py
+unit-test-all:
+	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -vvv --disable-warnings --testdox)
 
 ## Run the coverage check
 check-coverage:
-	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} coverage run --omit 'venv/*' -m pytest && coverage report -m)
+	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest --cov=src test/)
+# $(call execute_in_env, PYTHONPATH=${PYTHONPATH} coverage run \
+	# --omit=venv/* --omit=dependencies/python/ \
+	# -m pytest && coverage report --omit=venv/* --omit=dependencies/python/ -m)
+
+
 
 ## Run all checks
-run-checks:  run-black security-test unit-test check-coverage
+run-checks:  run-black security-test unit-test check-coverage run-flake8
 ## 

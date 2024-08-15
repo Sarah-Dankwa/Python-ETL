@@ -135,7 +135,6 @@ def lambda_handler(event=None, context=None):
     save_datetime_parameter(now)
 
 
-lambda_handler()
 
 
  
