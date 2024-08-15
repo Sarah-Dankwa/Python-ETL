@@ -142,7 +142,7 @@ def fetch_from_db(fetch_date=None):
 
 
             if single_table:
-                filename = f'{name}.parquet'
+                filename = f'/tmp/{name}.parquet'
                 key = name + '/' + year + '/' + month + '/' + day + '/' + time + '/' + name + '.parquet'
 
                 convert_to_parquet(single_table, filename)
