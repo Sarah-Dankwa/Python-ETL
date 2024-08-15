@@ -24,3 +24,14 @@ resource "aws_lambda_layer_version" "dependencies" {
   s3_key     = aws_s3_object.lambda_layer.key
 }
 
+# #add pndas layer from provided arn
+# resource "aws_serverlessapplicationrepository_cloudformation_stack" "aws_sdk_pandas_layer" {
+#   name           = "aws-sdk-pandas-layer-py3-12"
+#   application_id = "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python312:12"
+#   capabilities = [
+#     "CAPABILITY_IAM"
+#   ]
+# }
+
+
+
