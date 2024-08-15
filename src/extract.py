@@ -3,28 +3,15 @@ from botocore.exceptions import ClientError
 import boto3
 import json
 import pandas as pd
-import pyarrow as pa
-import pyarrow.parquet as pq
 import os
 from datetime import datetime
 import logging 
 
 logger = logging.getLogger() 
 
-# logging.getLogger().setLevel(logging.INFO)
+logging.getLogger().setLevel(logging.INFO)
 
-
-# delete line 14 and use this code to allow logger to work locally
-if len(logging.getLogger().handlers) > 0:
-    # The Lambda environment pre-configures a handler logging to stderr. If a handler is already configured,
-    # `.basicConfig` does not execute. Thus we set the level directly.
-    logging.getLogger().setLevel(logging.INFO)
-else:
-    logging.basicConfig(level=logging.INFO)
-
-
-# BUCKET_NAME = os.environ['BUCKET_NAME']
-BUCKET_NAME = 'sarah-jessica-test-bucket'
+BUCKET_NAME = os.environ['DATA_INGESTED_BUCKET_NAME']
 now = datetime.now()
 year = now.strftime('%Y')
 month = now.strftime('%m')
@@ -63,9 +50,7 @@ def get_single_table(table_name, fetch_date=None):
     query = f"SELECT * FROM {identifier(table_name)}"
 
     if fetch_date:
-        query += f" WHERE last_updated between {literal(fetch_date)} and {literal(str(now))};"
-        # may have to determine difference between using idientifer or literal for fetch data &/or now variables
-    
+        query += f" WHERE last_updated between {literal(fetch_date)} and {literal(str(now))};"    
     
     results = db.run(query)
     columns = [col["name"] for col in db.columns]
@@ -115,12 +100,12 @@ def list_bucket_objects():
    
 
 
-def full_fetch(fetch_date=None):
+def fetch_from_db(fetch_date=None):
     bucket_name = BUCKET_NAME
     client = boto3.client('s3')
     table_names = get_table_names()
 
-
+    is_updated=False
 
     for name in table_names:
         single_table = get_single_table(name,fetch_date)
@@ -136,9 +121,10 @@ def full_fetch(fetch_date=None):
                 filename, bucket_name, key
             )
             logger.info(f"{name} files added to s3 bucket")
+            is_updated=True
 
     
-        
+    return is_updated     
 
 
 def lambda_handler(event=None, context=None):
@@ -150,12 +136,12 @@ def lambda_handler(event=None, context=None):
 
     if object_count > 0:
         last_fetch_datetime = retrieve_datetime_parameter()
-        fetch_result = full_fetch(last_fetch_datetime)
+        fetch_result = fetch_from_db(last_fetch_datetime)
         if not fetch_result:
             logger.info("No new files have been added to the database at this stage")
        
     else:
-        full_fetch()
+        fetch_from_db()
         logger.info("Full fetch of files from database")
         
 
