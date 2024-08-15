@@ -8,7 +8,7 @@ from src.extract import (
     retrieve_datetime_parameter,
     save_datetime_parameter,
     list_bucket_objects,
-    full_fetch,
+    fetch_from_db,
     lambda_handler,
 )
 
@@ -84,17 +84,17 @@ class TestListBucketObjects:
 
 
 class TestFullFetch:
-    @pytest.mark.it("full fetch calls get_table_names function")
+    @pytest.mark.it("fetch from db calls get_table_names function")
     @patch("src.extract.BUCKET_NAME", "test-bucket")
     @patch("src.extract.get_table_names", return_value=["a", "b", "c"])
     @patch("src.extract.get_single_table", return_value={})
     def test_full_fetch_calls_get_table_names(
         self, mock_single_table, mock_table_names, s3_client
     ):
-        full_fetch()
+        fetch_from_db()
         mock_table_names.assert_called()
 
-    @pytest.mark.it("full fetch calls get_single_table with expected arguments")
+    @pytest.mark.it("fetch from db calls get_single_table with expected arguments")
     @patch("src.extract.BUCKET_NAME", "test-bucket")
     @patch("src.extract.get_table_names", return_value=["a", "b", "c"])
     @patch("src.extract.get_single_table", return_value={})
@@ -102,10 +102,10 @@ class TestFullFetch:
         self, mock_single_table, mock_table_names, s3_client
     ):
         expected_calls = [call("a", None), call("b", None), call("c", None)]
-        full_fetch()
+        fetch_from_db()
         assert mock_single_table.mock_calls == expected_calls
 
-    @pytest.mark.it("full fetch adds objects to s3 bucket with expected keys")
+    @pytest.mark.it("fetch from db adds objects to s3 bucket with expected keys")
     @patch("src.extract.BUCKET_NAME", "test-bucket")
     @patch("src.extract.year", "2020")
     @patch("src.extract.month", "10")
@@ -121,7 +121,7 @@ class TestFullFetch:
             "b/2020/10/10/13:40/b.parquet",
             "c/2020/10/10/13:40/c.parquet",
         ]
-        full_fetch()
+        fetch_from_db()
         objects = s3_client.list_objects_v2(Bucket="test-bucket")
         returned_keys = [o["Key"] for o in objects["Contents"]]
         assert returned_keys == expected_keys
@@ -130,10 +130,10 @@ class TestFullFetch:
 class TestLambdaHandler:
     @pytest.mark.it("lambda_handler calls list objects function")
     @patch("src.extract.save_datetime_parameter")
-    @patch("src.extract.full_fetch")
+    @patch("src.extract.fetch_from_db")
     @patch("src.extract.list_bucket_objects", return_value=0)
     def test_lambda_handler_calls_list_objects_function(
-        self, mock_list_objects, mock_full_fetch, mock_save_parameter, s3_client
+        self, mock_list_objects, mock_fetch_from_db, mock_save_parameter, s3_client
     ):
         lambda_handler()
         mock_list_objects.assert_called()
@@ -141,12 +141,12 @@ class TestLambdaHandler:
     @pytest.mark.it("when bucket is not empty retrieve datetime parameter is called")
     @patch("src.extract.retrieve_datetime_parameter")
     @patch("src.extract.save_datetime_parameter")
-    @patch("src.extract.full_fetch")
+    @patch("src.extract.fetch_from_db")
     @patch("src.extract.list_bucket_objects", return_value=1)
     def test_lambda_handler_calls_retrieve_date_time_param(
         self,
         mock_list_objects,
-        mock_full_fetch,
+        mock_fetch_from_db,
         mock_save_parameter,
         mock_date_time,
         s3_client,
@@ -158,39 +158,39 @@ class TestLambdaHandler:
         "when bucket is empty lambda handler calls full " + "fetch with no arguments"
     )
     @patch("src.extract.save_datetime_parameter")
-    @patch("src.extract.full_fetch")
+    @patch("src.extract.fetch_from_db")
     @patch("src.extract.list_bucket_objects", return_value=0)
     def test_lambda_handler_calls_full_fetch_with_no_args(
-        self, mock_list_objects, mock_full_fetch, mock_save_parameter, s3_client
+        self, mock_list_objects, mock_fetch_from_db, mock_save_parameter, s3_client
     ):
         lambda_handler()
-        mock_full_fetch.assert_called_with()
+        mock_fetch_from_db.assert_called_with()
 
     @pytest.mark.it(
         "when bucket is not empty lambda handler calls"
-        + " full fetch expected argument"
+        + " fetch from db expected argument"
     )
     @patch("src.extract.retrieve_datetime_parameter", return_value="expected")
     @patch("src.extract.save_datetime_parameter")
-    @patch("src.extract.full_fetch")
+    @patch("src.extract.fetch_from_db")
     @patch("src.extract.list_bucket_objects", return_value=1)
     def test_lambda_handler_calls_full_fetch_with_expected_args(
         self,
         mock_list_objects,
-        mock_full_fetch,
+        mock_fetch_from_db,
         mock_save_parameter,
         mock_date_time,
         s3_client,
     ):
         lambda_handler()
-        mock_full_fetch.assert_called_with("expected")
+        mock_fetch_from_db.assert_called_with("expected")
 
     @pytest.mark.it("lambda handler calls save date time parameter")
     @patch("src.extract.save_datetime_parameter")
-    @patch("src.extract.full_fetch")
+    @patch("src.extract.fetch_from_db")
     @patch("src.extract.list_bucket_objects", return_value=0)
     def test_lambda_handler_calls_save_datetime_parameter(
-        self, mock_list_objects, mock_full_fetch, mock_save_parameter, s3_client
+        self, mock_list_objects, mock_fetch_from_db, mock_save_parameter, s3_client
     ):
         lambda_handler()
         mock_save_parameter.assert_called()
