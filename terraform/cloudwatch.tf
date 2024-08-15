@@ -27,7 +27,7 @@ resource "aws_cloudwatch_metric_alarm" "extract_metric_alarm" {
   statistic                 = "Sum"
   threshold                 = 1
   alarm_description         = "This metric monitors ERROR in loggroup"
-  alarm_actions             = ["${resource.aws_sns_topic.extract_metric_alarm_updates.arn}"]
+  alarm_actions             = [aws_sns_topic.extract_metric_alarm_updates.arn]
   insufficient_data_actions = []
 }
 
