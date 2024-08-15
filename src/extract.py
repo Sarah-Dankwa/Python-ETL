@@ -127,7 +127,7 @@ def fetch_from_db(fetch_date=None):
     bucket_name = BUCKET_NAME
     client = boto3.client('s3')
     table_names = get_table_names()
-    is_updated=False
+    udpated_tables = []
 
     if len(table_names) < 11:
         logger.error("There is a table missing from the database")
@@ -144,17 +144,17 @@ def fetch_from_db(fetch_date=None):
             if single_table:
                 filename = f'/tmp/{name}.parquet'
                 key = name + '/' + year + '/' + month + '/' + day + '/' + time + '/' + name + '.parquet'
-
+                udpated_tables.append(key)
+                
                 convert_to_parquet(single_table, filename)
 
                 client.upload_file(
                     filename, bucket_name, key
                 )
                 logger.info(f"{name} files added to s3 bucket")
-                is_updated=True
 
     
-    return is_updated     
+    return udpated_tables     
 
 
 def lambda_handler(event=None, context=None):
@@ -179,6 +179,7 @@ def lambda_handler(event=None, context=None):
         
 
     save_datetime_parameter(now)
+    return fetch_result
 
    
 
