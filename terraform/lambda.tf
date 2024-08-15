@@ -25,13 +25,13 @@ resource "aws_lambda_function" "workflow_tasks_extract" {
   role             = aws_iam_role.lambda_role.arn
   handler          = "${var.extract_lambda}.lambda_handler"
   runtime          = "python3.12"
-  timeout          = 60
+  timeout          = 120
 
   s3_bucket        = aws_s3_bucket.code_bucket.bucket
   s3_key           = "${var.extract_lambda}/function.zip"
   
   layers           = [aws_lambda_layer_version.dependencies.arn]
-
+                    #[for k, v in aws_serverlessapplicationrepository_cloudformation_stack.aws_sdk_pandas_layer.outputs : v][0]
   depends_on = [aws_s3_object.lambda_code, aws_s3_object.lambda_layer]
 
   environment {

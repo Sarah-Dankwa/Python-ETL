@@ -54,10 +54,14 @@ resource "aws_iam_role_policy_attachment" "name" {
 data "aws_iam_policy_document" "s3_document"{
     statement {
 
-        actions = ["s3:PutObject"]
+        effect = "Allow"
+        actions = ["s3:PutObject",
+                   "s3:GetObject",
+                   "s3:ListBucket"]
 
         resources = [
             "${aws_s3_bucket.ingested_data_bucket.arn}/*",
+            "${aws_s3_bucket.ingested_data_bucket.arn}"
         ]       
     }
 
@@ -177,6 +181,28 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_sns_policy_attachment" {
   policy_arn = aws_iam_policy.cloudwatch_sns_policy.arn
 }
 
+// Creating a terraform IAMS role for Lambda, cloudwatch and eventbridge
+resource "aws_iam_role" "state_lambda_role" {
+    name_prefix = "role-${var.extract_lambda}"
+    assume_role_policy = <<EOF
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Action": [
+                    "sts:AssumeRole"
+                ],
+                "Principal":{
+                    "Service": [
+                        "states.amazonaws.com"
+                    ]
+                }
+            }
+        ]
+    }
+    EOF
+}
 
 //Set up terraform IAMS for Step Functions - Lambda
 data "aws_iam_policy_document" "stepfunctions_lambda_policy_document" {
@@ -186,7 +212,9 @@ data "aws_iam_policy_document" "stepfunctions_lambda_policy_document" {
                 "lambda:InvokeFunction"
             ]
             resources = [
-                "arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:${var.extract_lambda}"
+                "arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:${var.extract_lambda}",
+                "arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:${var.transform_lambda}",
+                "arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:${var.load_lambda}"
             ]
         }
 }
@@ -200,7 +228,7 @@ resource "aws_iam_policy" "stepfunction_lambda_policy" {
 
 # Attach the Policy to the Role
 resource "aws_iam_role_policy_attachment" "stepfunction_lambda_policy_attachment" {
-  role       = aws_iam_role.lambda_role.name
+  role       = aws_iam_role.state_lambda_role.name
   policy_arn = aws_iam_policy.stepfunction_lambda_policy.arn
 }
 
@@ -258,7 +286,7 @@ data "aws_iam_policy_document" "ssm_policy_document" {
 	statement {
 		actions = [
 			"ssm:GetParameter",
-            "ssm:PutParamater"
+            "ssm:PutParameter"
 		]
 		resources = [
 			"arn:aws:ssm:eu-west-2:590183674561:parameter/latest-extract"
