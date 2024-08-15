@@ -5,9 +5,8 @@ module "eventbridge" {
 
   rules = {
     crons = {
-      //http://www.cronmaker.com used to find schedule format
       description         = "Run state machine everyday 15:00 UTC"
-      schedule_expression = "cron(0 0/15 * 1/1 * ? *)"
+      schedule_expression = "cron(*/15 * ? * * *)"
     }
   }
 
