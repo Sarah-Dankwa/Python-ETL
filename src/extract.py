@@ -7,6 +7,20 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import os
 from datetime import datetime
+import logging 
+
+logger = logging.getLogger() 
+
+# logging.getLogger().setLevel(logging.INFO)
+
+
+# delete line 14 and use this code to allow logger to work locally
+if len(logging.getLogger().handlers) > 0:
+    # The Lambda environment pre-configures a handler logging to stderr. If a handler is already configured,
+    # `.basicConfig` does not execute. Thus we set the level directly.
+    logging.getLogger().setLevel(logging.INFO)
+else:
+    logging.basicConfig(level=logging.INFO)
 
 
 # BUCKET_NAME = os.environ['BUCKET_NAME']
@@ -16,7 +30,7 @@ year = now.strftime('%Y')
 month = now.strftime('%m')
 day = now.strftime('%d')
 time = now.strftime('%H:%M:%S')
-# print(str(now)[:-3])
+
 
 def get_database_credentials():
     secret_name = "totesys-database"
@@ -106,8 +120,11 @@ def full_fetch(fetch_date=None):
     client = boto3.client('s3')
     table_names = get_table_names()
 
+
+
     for name in table_names:
         single_table = get_single_table(name,fetch_date)
+
 
         if single_table:
             filename = f'{name}.parquet'
@@ -118,19 +135,31 @@ def full_fetch(fetch_date=None):
             client.upload_file(
                 filename, bucket_name, key
             )
+            logger.info(f"{name} files added to s3 bucket")
 
-
+    
+        
 
 
 def lambda_handler(event=None, context=None):
+
+    if not connect_to_db():
+        logger.error("NO CONNECTION TO DATABASE - PLEASE CHECK")
 
     object_count = list_bucket_objects()
 
     if object_count > 0:
         last_fetch_datetime = retrieve_datetime_parameter()
-        full_fetch(last_fetch_datetime)
+        fetch_result = full_fetch(last_fetch_datetime)
+        if not fetch_result:
+            logger.info("No new files have been added to the database at this stage")
+       
     else:
         full_fetch()
+        logger.info("Full fetch of files from database")
+        
+
+    
 
     save_datetime_parameter(now)
 
