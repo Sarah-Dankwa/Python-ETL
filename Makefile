@@ -49,8 +49,8 @@ custom-dependencies: create-environment logdirs
 	mkdir -p dependencies/python
 	rm -rf dependencies/python/*
 
-	@echo ">>> Installing pandas to dependencies/python..."
-	$(call execute_in_env, $(PIP) install pandas -t dependencies/python --no-cache-dir)
+##	@echo ">>> Installing pandas to dependencies/python..."
+##	$(call execute_in_env, $(PIP) install pandas -t dependencies/python --no-cache-dir)
 
 	@echo ">>> Installing pg8000 to dependencies/python..."
 	$(call execute_in_env, $(PIP) install pg8000 -t dependencies/python --no-cache-dir)
