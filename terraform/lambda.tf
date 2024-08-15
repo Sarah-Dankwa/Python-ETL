@@ -25,6 +25,7 @@ resource "aws_lambda_function" "workflow_tasks_extract" {
   role             = aws_iam_role.lambda_role.arn
   handler          = "${var.extract_lambda}.lambda_handler"
   runtime          = "python3.12"
+  timeout          = 60
 
   s3_bucket        = aws_s3_bucket.code_bucket.bucket
   s3_key           = "${var.extract_lambda}/function.zip"
