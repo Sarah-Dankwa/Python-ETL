@@ -1,5 +1,5 @@
 from pg8000.native import Connection, identifier, literal
-from pg8000.exceptions import DatabaseError
+from pg8000.exceptions import DatabaseError, InterfaceError
 from botocore.exceptions import ClientError
 import boto3
 import json
@@ -27,31 +27,34 @@ def get_database_credentials():
     client = boto3.client("secretsmanager")
     try:
         get_secret_value = client.get_secret_value(SecretId=secret_name)
+        secret = get_secret_value["SecretString"]
+        secret_dict = json.loads(secret)
+        return secret_dict
+
     except client.exceptions.ResourceNotFoundException as e:
         if e.response['Error']['Code'] == 'ResourceNotFoundException':
              logger.error(f"The database [{secret_name}] could not be found")
-
-    secret = get_secret_value["SecretString"]
-    secret_dict = json.loads(secret)
-    return secret_dict
+        
 
 
 def connect_to_db():
-    secret = get_database_credentials()
-
-    return Connection(
-        user=secret["Username"],
-        database=secret["Database"],
-        password=secret["Password"],
-        host=secret["Hostname"],
-        port=secret["Port"]
-    )
+    try:
+        secret = get_database_credentials()
+        return Connection(
+            user=secret["Username"],
+            database=secret["Database"],
+            password=secret["Password"],
+            host=secret["Hostname"],
+            port=secret["Port"]
+        )
+    except InterfaceError as e:
+        logger.error("NO CONNECTION TO DATABASE - PLEASE CHECK")
 
 
 def get_single_table(table_name, fetch_date=None):
-    db = connect_to_db()
-
+    db = None
     try:
+        db = connect_to_db()
         query = f"SELECT * FROM {identifier(table_name)}"
 
         if fetch_date:
@@ -62,11 +65,12 @@ def get_single_table(table_name, fetch_date=None):
         final = [dict(zip(columns, payment_type)) for payment_type in results]
         return final
     
-    except (DatabaseError, ClientError) as e:
-        logger.error(f"Database or Client error: {e}")
+    except (DatabaseError, ClientError, InterfaceError, AttributeError) as e:
+        logger.error(f"Error: {e}")
 
     finally:
-        db.close()
+        if db:
+            db.close()
 
 def convert_to_parquet(result, filename):
     df = pd.DataFrame(result)
@@ -74,23 +78,25 @@ def convert_to_parquet(result, filename):
 
 
 def get_table_names():
-
-    db = connect_to_db()
-    query = """
-    SELECT table_name 
-    FROM information_schema.tables 
-    WHERE table_schema = 'public';"""
+    db = None
+    table_names = []
     try:
+        db = connect_to_db()
+        query = """
+        SELECT table_name 
+        FROM information_schema.tables 
+        WHERE table_schema = 'public';"""
 
         results = db.run(query)
         table_names = [row[0] for row in results if row != ['_prisma_migrations']]
-        return table_names
-    
-    except DatabaseError as e:
+        
+    except (DatabaseError, AttributeError) as e:
         logger.error("Tables names cannot be accessed")
 
     finally:
-        db.close()
+        if db:
+            db.close()
+        return table_names
 
 def save_datetime_parameter(now):
     client = boto3.client("ssm")
@@ -129,7 +135,7 @@ def fetch_from_db(fetch_date=None):
     udpated_tables = []
 
     if len(table_names) < 11:
-        logger.error("There is a table missing from the database")
+        logger.error(f"There are {len(table_names)} tables fetched from the database - please check.")
         
     elif len(table_names) > 11:
         logger.warn("A table has been added to the database")
@@ -158,8 +164,8 @@ def fetch_from_db(fetch_date=None):
 
 def lambda_handler(event=None, context=None):
 
-    if not connect_to_db():
-        logger.error("NO CONNECTION TO DATABASE - PLEASE CHECK")
+    # if not connect_to_db():
+    #     logger.error("NO CONNECTION TO DATABASE - PLEASE CHECK")
 
     if not BUCKET_NAME:
         logger.error("BUCKET NOT FOUND - PLEASE CHECK")
