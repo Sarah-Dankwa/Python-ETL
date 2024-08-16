@@ -32,7 +32,8 @@ data "aws_iam_policy_document" "cw_document"{
     statement {
       effect = "Allow"
       actions = ["logs:CreateLogStream","logs:PutLogEvents"]
-      resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.extract_lambda}:*"]
+      resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.extract_lambda}:*",
+                    "arn:aws:logs:eu-west-2:590183674561:log-group:${aws_cloudwatch_log_group.alapin_extract_log_group.name}:*"]
     }
 }
 
