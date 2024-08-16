@@ -164,9 +164,6 @@ def fetch_from_db(fetch_date=None):
 
 def lambda_handler(event=None, context=None):
 
-    # if not connect_to_db():
-    #     logger.error("NO CONNECTION TO DATABASE - PLEASE CHECK")
-
     if not BUCKET_NAME:
         logger.error("BUCKET NOT FOUND - PLEASE CHECK")
 
