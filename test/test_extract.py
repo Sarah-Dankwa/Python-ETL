@@ -36,7 +36,7 @@ def invalid_db_credentials(secretsmanager_client_test):
     )
     yield secretsmanager_client_test
 
-@pytest.mark.skip
+
 class TestGetDatabaseCredentials:
     '''tests for get database credentials function'''
 
@@ -74,7 +74,6 @@ class TestGetDatabaseCredentials:
             assert "The database [totesys-database] could not be found" in caplog.text
 
 
-@pytest.mark.skip
 class TestDatabaseCredsAndConnection:
     '''test database connection function'''
     @pytest.mark.it("Test db connection connects to database")
@@ -83,7 +82,6 @@ class TestDatabaseCredsAndConnection:
         assert isinstance(db, Connection)
 
 
-@pytest.mark.skip
 class TestGetSingleTable:
     '''test get single table function'''
 
@@ -126,7 +124,6 @@ class TestGetSingleTable:
             assert "Database or Client error:" in caplog.text
 
 
-@pytest.mark.skip
 class TestConvertToParquet:
     @pytest.mark.it("convert to parquet saves files to a parquet format")
     def test_convert_to_parquet_saves_to_parquet_format(self, tmp_path):
@@ -139,7 +136,6 @@ class TestConvertToParquet:
         assert temp == [{"key1": "val1"}, {"key1": "val2"}]
 
 
-@pytest.mark.skip
 class TestGetTableNames:
     '''testing get table names function'''
 
@@ -164,7 +160,6 @@ class TestGetTableNames:
             assert "NO CONNECTION TO DATABASE - PLEASE CHECK" in caplog.text
 
 
-@pytest.mark.skip
 class TestRetrieveDateTimeParameter:
     '''test retrieve date time parameter function'''
 
@@ -180,7 +175,6 @@ class TestRetrieveDateTimeParameter:
             assert "Could not retrieve date parameter:" in caplog.text
 
 
-@pytest.mark.skip
 class TestSaveDateTimeParameter:
     '''test dave date time paramenter function'''
 
@@ -190,7 +184,6 @@ class TestSaveDateTimeParameter:
         assert retrieve_datetime_parameter() == "hello"
 
 
-@pytest.mark.skip
 @patch("src.extract.BUCKET_NAME", "test-ingestion-bucket")
 class TestListBucketObjects:
     @pytest.mark.it("returns 0 when no objects in bucket")
@@ -203,7 +196,6 @@ class TestListBucketObjects:
         assert list_bucket_objects() == 1
 
 
-@pytest.mark.skip
 @patch("src.extract.BUCKET_NAME", "test-ingestion-bucket")
 class TestFetchFromDB:
     '''test fetch from db function'''
@@ -368,12 +360,12 @@ class TestFetchFromDB:
             assert key in returned_keys
 
 
-@patch("src.extract.BUCKET_NAME", "test-ingestion-bucket")
 class TestLambdaHandler:
     '''tests from lambda handler function'''
 
     @pytest.mark.xfail(reason='unbound error in get_db_creds func')
     @pytest.mark.it("lambda_handler logs error if no connection")
+    @patch("src.extract.BUCKET_NAME", "test-ingestion-bucket")
     @patch("src.extract.save_datetime_parameter")
     @patch("src.extract.fetch_from_db")
     @patch("src.extract.list_bucket_objects", return_value=0)
@@ -390,7 +382,6 @@ class TestLambdaHandler:
             assert "NO CONNECTION TO DATABASE - PLEASE CHECK" in caplog.text
 
 
-    #@pytest.mark.xfail(reason='unbound error in get_db_creds func')
     @pytest.mark.it("lambda_handler logs error if no bucket variable")
     @patch("src.extract.save_datetime_parameter")
     @patch("src.extract.fetch_from_db")
@@ -406,11 +397,11 @@ class TestLambdaHandler:
         with caplog.at_level(logging.ERROR):
             lambda_handler({}, {})
             print(caplog.text)
-            #assert "BUCKET NOT FOUND - PLEASE CHECK" in caplog.text
+            assert "BUCKET NOT FOUND - PLEASE CHECK" in caplog.text
 
 
-    @pytest.mark.skip
     @pytest.mark.it("lambda_handler calls list objects function")
+    @patch("src.extract.BUCKET_NAME", "test-ingestion-bucket")
     @patch("src.extract.save_datetime_parameter")
     @patch("src.extract.fetch_from_db")
     @patch("src.extract.list_bucket_objects", return_value=0)
@@ -424,24 +415,10 @@ class TestLambdaHandler:
         lambda_handler()
         mock_list_objects.assert_called()
 
-    @pytest.mark.skip
-    @pytest.mark.it("lambda_handler calls list objects function")
-    @patch("src.extract.save_datetime_parameter")
-    @patch("src.extract.fetch_from_db")
-    @patch("src.extract.list_bucket_objects", return_value=0)
-    def test_lambda_handler_calls_list_objects_function(
-        self, 
-        mock_list_objects, 
-        mock_fetch_from_db, 
-        mock_save_parameter,
-        secretsmanager_client
-    ):
-        lambda_handler()
-        mock_list_objects.assert_called()
     
-    @pytest.mark.skip
     @pytest.mark.it("when bucket is not empty retrieve datetime parameter is called")
-    @patch("src.extract.retrieve_datetime_parameter")
+    @patch("src.extract.BUCKET_NAME", "test-ingestion-bucket")
+    @patch("src.extract.retrieve_datetime_parameter", return_value="2024-01-01")
     @patch("src.extract.list_bucket_objects", return_value=1)
     def test_lambda_handler_calls_retrieve_date_time_param(
         self,
@@ -454,7 +431,7 @@ class TestLambdaHandler:
         lambda_handler()
         mock_date_time.assert_called()
 
-    @pytest.mark.skip
+
     @pytest.mark.it(
         "when bucket is empty lambda handler calls full " + "fetch with no arguments"
     )
@@ -467,12 +444,12 @@ class TestLambdaHandler:
         lambda_handler()
         mock_fetch_from_db.assert_called_with()
 
-    @pytest.mark.skip
+
     @pytest.mark.it(
         "when bucket is not empty lambda handler calls"
         + " fetch from db expected argument"
     )
-    @patch("src.extract.retrieve_datetime_parameter", return_value="expected")
+    @patch("src.extract.retrieve_datetime_parameter", return_value="2024-01-01")
     @patch("src.extract.save_datetime_parameter")
     @patch("src.extract.fetch_from_db")
     @patch("src.extract.list_bucket_objects", return_value=1)
@@ -486,9 +463,9 @@ class TestLambdaHandler:
         secretsmanager_client
     ):
         lambda_handler()
-        mock_fetch_from_db.assert_called_with("expected")
+        mock_fetch_from_db.assert_called_with("2024-01-01")
 
-    @pytest.mark.skip
+
     @pytest.mark.it("lambda handler calls save date time parameter")
     @patch("src.extract.connect_to_db", return_value=True)
     @patch("src.extract.save_datetime_parameter")
