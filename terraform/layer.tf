@@ -19,9 +19,11 @@ data "archive_file" "layer_code" {
 
 #need iam permission of lambda:CreateLayerVersion, or maybe lambda:DeleteLayerVersion
 resource "aws_lambda_layer_version" "dependencies" {
-  layer_name = "pandas_library_layer" 
+  layer_name = "library_layer" 
   s3_bucket  = aws_s3_object.lambda_layer.bucket
   s3_key     = aws_s3_object.lambda_layer.key
+  compatible_runtimes = ["python3.12"]
+  
 }
 
 # #add pndas layer from provided arn
