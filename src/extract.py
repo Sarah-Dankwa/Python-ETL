@@ -6,14 +6,16 @@ import json
 import pandas as pd
 import os
 from datetime import datetime
-import logging 
+import logging
+import pytz 
 
 logger = logging.getLogger() 
 
 logging.getLogger().setLevel(logging.INFO)
 
-BUCKET_NAME = os.environ['DATA_INGESTED_BUCKET_NAME']
-now = datetime.now()
+BUCKET_NAME = os.environ.get('DATA_INGESTED_BUCKET_NAME')
+uk_time = pytz.timezone('Europe/London')
+now = datetime.now(uk_time)
 year = now.strftime('%Y')
 month = now.strftime('%m')
 day = now.strftime('%d')
@@ -23,10 +25,8 @@ time = now.strftime('%H:%M:%S')
 def get_database_credentials():
     secret_name = "totesys-database"
     client = boto3.client("secretsmanager")
-
     try:
         get_secret_value = client.get_secret_value(SecretId=secret_name)
-
     except client.exceptions.ResourceNotFoundException as e:
         if e.response['Error']['Code'] == 'ResourceNotFoundException':
              logger.error(f"The database [{secret_name}] could not be found")
@@ -84,7 +84,6 @@ def get_table_names():
 
         results = db.run(query)
         table_names = [row[0] for row in results if row != ['_prisma_migrations']]
-        db.close()
         return table_names
     
     except DatabaseError as e:
@@ -162,6 +161,7 @@ def lambda_handler(event=None, context=None):
     if not connect_to_db():
         logger.error("NO CONNECTION TO DATABASE - PLEASE CHECK")
 
+    print(BUCKET_NAME)
     if not BUCKET_NAME:
         logger.error("BUCKET NOT FOUND - PLEASE CHECK")
 
@@ -174,7 +174,7 @@ def lambda_handler(event=None, context=None):
             logger.info("No new files have been added to the database at this stage")
        
     else:
-        fetch_from_db()
+        fetch_result = fetch_from_db()
         logger.info("Full fetch of files from database")
         
 

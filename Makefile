@@ -98,11 +98,12 @@ run-flake8: dev-setup
 unit-test:
 	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -vvv \
 	--ignore=dependencies/python/ \
+	--no-summary \
 	--testdox)
 
 ## Run all tests including test_recorder.py, test_import.py
 unit-test-all:
-	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -vvv --disable-warnings --testdox)
+	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -vvv --disable-warnings --testdox --no-summary)
 
 ## Run the coverage check
 check-coverage:
