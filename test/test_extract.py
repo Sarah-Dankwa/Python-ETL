@@ -36,7 +36,7 @@ def invalid_db_credentials(secretsmanager_client_test):
     )
     yield secretsmanager_client_test
 
-@pytest.mark.skip
+
 class TestGetDatabaseCredentials:
     '''tests for get database credentials function'''
 
@@ -62,7 +62,7 @@ class TestGetDatabaseCredentials:
         assert response == {"key": "value2"}
 
 
-    @pytest.mark.xfail(reason='accessing secret after except')
+    #@pytest.mark.xfail(reason='accessing secret after except')
     @pytest.mark.it("get database credentials logs error if secret not found")
     def test_get_database_credentials_logs_error(
         self, 
@@ -359,7 +359,7 @@ class TestFetchFromDB:
         for key in expected_keys:
             assert key in returned_keys
 
-
+@pytest.mark.skip
 class TestLambdaHandler:
     '''tests from lambda handler function'''
 

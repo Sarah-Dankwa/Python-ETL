@@ -2,7 +2,6 @@ import pytest
 import os
 import boto3
 from moto import mock_aws
-from pg8000.native import Connection
 from dotenv import load_dotenv
 import json
 from unittest.mock import patch
