@@ -5,7 +5,7 @@ module "eventbridge" {
 
   rules = {
     crons = {
-      description         = "Run state machine everyday 15:00 UTC"
+      description         = "Run state machine every 15 minutes"
       schedule_expression = "cron(*/15 * ? * * *)"
     }
   }

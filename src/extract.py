@@ -91,6 +91,7 @@ def get_table_names():
         table_names = [row[0] for row in results if row != ['_prisma_migrations']]
         
     except (DatabaseError, AttributeError) as e:
+
         logger.error("Tables names cannot be accessed")
 
     finally:

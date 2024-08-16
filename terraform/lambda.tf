@@ -30,8 +30,9 @@ resource "aws_lambda_function" "workflow_tasks_extract" {
   s3_bucket        = aws_s3_bucket.code_bucket.bucket
   s3_key           = "${var.extract_lambda}/function.zip"
   
-  layers           = [aws_lambda_layer_version.dependencies.arn]
-                    #[for k, v in aws_serverlessapplicationrepository_cloudformation_stack.aws_sdk_pandas_layer.outputs : v][0]
+  layers           = [aws_lambda_layer_version.dependencies.arn,
+                      "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python312:12"]
+
   depends_on = [aws_s3_object.lambda_code, aws_s3_object.lambda_layer]
 
   environment {
@@ -58,9 +59,14 @@ resource "aws_lambda_function" "workflow_tasks_transform" {
   role             = aws_iam_role.lambda_role.arn
   handler          = "${var.transform_lambda}.lambda_handler"
   runtime          = "python3.12"
+  timeout          = 120
+
 
   s3_bucket        = aws_s3_bucket.code_bucket.bucket
   s3_key           = "${var.transform_lambda}/function.zip"
+  
+  layers           = [aws_lambda_layer_version.dependencies.arn,
+                      "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python312:12"]
 
   depends_on = [aws_s3_object.lambda_code]
 
@@ -70,8 +76,10 @@ resource "aws_lambda_function" "workflow_tasks_transform" {
       KEY_NAME = "processed_data"
     } 
   }
+  
 
-   logging_config {
+
+  logging_config {
     log_format = "JSON"
     log_group = aws_cloudwatch_log_group.alapin_extract_log_group.name
     application_log_level = "INFO"
@@ -86,12 +94,18 @@ resource "aws_lambda_function" "workflow_tasks_load" {
   role             = aws_iam_role.lambda_role.arn
   handler          = "${var.load_lambda}.lambda_handler"
   runtime          = "python3.12"
+  timeout          = 120
+
 
   s3_bucket        = aws_s3_bucket.code_bucket.bucket
   s3_key           = "${var.load_lambda}/function.zip"
+  
+  layers           = [aws_lambda_layer_version.dependencies.arn,
+                      "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python312:12"]
+
 
   depends_on = [aws_s3_object.lambda_code]
-
+ 
   environment {
     variables = {
       DATA_PROCESSED_BUCKET_NAME = aws_s3_bucket.processed_data_bucket.id
