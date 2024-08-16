@@ -83,8 +83,7 @@ def get_table_names():
     try:
 
         results = db.run(query)
-        table_names = [row[0] for row in results if row != ['_prisma_migrations']]
-        db.close()
+        table_names = [row[0] for row in results if row != ['_prisma_migrations']]  
         return table_names
     
     except DatabaseError as e:
