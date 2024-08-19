@@ -45,6 +45,12 @@ jobs:
           run: make all-requirements
         - name: Checkout
           uses: actions/checkout@v4
+        - name: Python Init
+          uses: actions/setup-python@v5
+          with:
+            python-version: '3.11.5'
+        - name: Run Requirements
+          run: make all-requirements
         - name: Terraform install
           uses: hashicorp/setup-terraform@v3
         - name: AWS Credentials
