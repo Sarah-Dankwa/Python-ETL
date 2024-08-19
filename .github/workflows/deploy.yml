@@ -41,6 +41,8 @@ jobs:
       needs: run-tests
       environment: dev
       steps:
+        - name: Run Requirements
+          run: make all-requirements
         - name: Checkout
           uses: actions/checkout@v4
         - name: Terraform install
