@@ -13,21 +13,22 @@ from src.extract import (
     get_table_names,
     save_datetime_parameter,
     retrieve_datetime_parameter,
-    list_bucket_objects
+    list_bucket_objects,
 )
+
 
 @pytest.fixture
 def invalid_db_credentials(secretsmanager_client_test):
-    '''invalid database connections added to mock secrets manager to test 
+    """invalid database connections added to mock secrets manager to test
     error handling
-    '''
+    """
 
     secret = {}
-    secret['Database'] = 'invalid_db'
-    secret['Hostname'] = 'invalid_host'
-    secret['Username'] = 'invalid_user'
-    secret['Password'] = 'invalid_password'
-    secret['Port'] = 'invalid_port'
+    secret["Database"] = "invalid_db"
+    secret["Hostname"] = "invalid_host"
+    secret["Username"] = "invalid_user"
+    secret["Password"] = "invalid_password"
+    secret["Port"] = "invalid_port"
     json_secret = json.dumps(secret)
     secretsmanager_client_test.create_secret(
         Name="totesys-database", SecretString=json_secret
@@ -36,22 +37,17 @@ def invalid_db_credentials(secretsmanager_client_test):
 
 
 class TestGetDatabaseCredentials:
-    '''tests for get database credentials function'''
+    """tests for get database credentials function"""
 
     @pytest.mark.it("get database credentials returns a dictionary")
-    def test_get_database_credentials_returns_a_dictionary(
-        self, 
-        secretsmanager_client
-    ):
+    def test_get_database_credentials_returns_a_dictionary(self, secretsmanager_client):
 
         response = get_database_credentials()
         assert isinstance(response, dict)
 
-
     @pytest.mark.it("logs error if secret not found")
     def test_get_database_credentials_returns_expected(
-        self, 
-        secretsmanager_client_test
+        self, secretsmanager_client_test
     ):
         secretsmanager_client_test.create_secret(
             Name="totesys-database", SecretString='{"key": "value2"}'
@@ -59,12 +55,9 @@ class TestGetDatabaseCredentials:
         response = get_database_credentials()
         assert response == {"key": "value2"}
 
-
     @pytest.mark.it("get database credentials logs error if secret not found")
     def test_get_database_credentials_logs_error(
-        self, 
-        caplog,
-        secretsmanager_client_test
+        self, caplog, secretsmanager_client_test
     ):
         with caplog.at_level(logging.INFO):
             get_database_credentials()
@@ -72,7 +65,8 @@ class TestGetDatabaseCredentials:
 
 
 class TestDatabaseCredsAndConnection:
-    '''test database connection function'''
+    """test database connection function"""
+
     @pytest.mark.it("Test db connection connects to database")
     def test_connection_to_db(self, secretsmanager_client):
         db = connect_to_db()
@@ -80,7 +74,7 @@ class TestDatabaseCredsAndConnection:
 
 
 class TestGetSingleTable:
-    '''test get single table function'''
+    """test get single table function"""
 
     @pytest.mark.it("Test returns a list of dictionaries")
     def test_returns_list_of_dictionaries(self, secretsmanager_client):
@@ -110,10 +104,9 @@ class TestGetSingleTable:
             get_single_table("table_not_in_db")
             assert 'relation "table_not_in_db" does not exist' in caplog.text
 
-    
     @pytest.mark.it("logs error if incorrect credentials")
     def test_logs_error_with_invalid_db(self, invalid_db_credentials, caplog):
-        
+
         with caplog.at_level(logging.ERROR):
             get_single_table("sales_order")
             assert "NO CONNECTION TO DATABASE - PLEASE CHECK" in caplog.text
@@ -130,33 +123,31 @@ class TestConvertToParquet:
         temp = pq.read_table(sample_filename).to_pylist()
         assert temp == [{"key1": "val1"}, {"key1": "val2"}]
 
+
 @patch("src.extract.BUCKET_NAME", "test-ingestion-bucket")
 class TestGetTableNames:
-    '''testing get table names function'''
+    """testing get table names function"""
 
     @pytest.mark.it("table names retrieves list of table names")
-    def test_table_names_gets_list_of_table_names(self, secretsmanager_client, table_names):
+    def test_table_names_gets_list_of_table_names(
+        self, secretsmanager_client, table_names
+    ):
         expected = table_names
-        result = get_table_names() 
+        result = get_table_names()
         assert result == expected
-
 
     @pytest.mark.it("table names logs error if database cannot be accessed")
     def test_table_names_gets_list_of_table_names(
-        self, 
-        invalid_db_credentials,
-        caplog,
-        s3_client,
-        table_names
+        self, invalid_db_credentials, caplog, s3_client, table_names
     ):
-        
+
         with caplog.at_level(logging.ERROR):
             get_table_names()
             assert "Tables names cannot be accessed" in caplog.text
 
 
 class TestRetrieveDateTimeParameter:
-    '''test retrieve date time parameter function'''
+    """test retrieve date time parameter function"""
 
     @pytest.mark.it("retrieves parameter from ssm parameter store")
     def test_retrieves_parameter_from_ssm_parameter_store(self, ssm_client):
@@ -171,7 +162,7 @@ class TestRetrieveDateTimeParameter:
 
 
 class TestSaveDateTimeParameter:
-    '''test dave date time paramenter function'''
+    """test dave date time paramenter function"""
 
     @pytest.mark.it("saves parameter to ssm parameter store")
     def test_saves_parameter_to_ssm_parameter_store(self, ssm_client):
@@ -187,6 +178,7 @@ class TestListBucketObjects:
 
     @pytest.mark.it("returns number of objects when objects in bucket")
     def test_returns_1_for_1_item_in_bucket(self, s3_client):
-        s3_client.put_object(Bucket="test-ingestion-bucket", Body="hello", Key="test.txt")
+        s3_client.put_object(
+            Bucket="test-ingestion-bucket", Body="hello", Key="test.txt"
+        )
         assert list_bucket_objects() == 1
-
