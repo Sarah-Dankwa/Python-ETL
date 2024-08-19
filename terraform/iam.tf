@@ -205,12 +205,14 @@ resource "aws_iam_role" "state_lambda_role" {
     EOF
 }
 
-//Set up terraform IAMS for Step Functions - Lambda
+//Set up terraform IAMS for Step Functions using Lambda
 data "aws_iam_policy_document" "stepfunctions_lambda_policy_document" {
     statement {
             effect= "Allow"
             actions= [
-                "lambda:InvokeFunction"
+                "lambda:InvokeFunction",
+                "lambda:CreateLayerVersion",
+                "lambda:DeleteLayerVersion"
             ]
             resources = [
                 "arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:${var.extract_lambda}",
@@ -227,13 +229,13 @@ resource "aws_iam_policy" "stepfunction_lambda_policy" {
   policy = data.aws_iam_policy_document.stepfunctions_lambda_policy_document.json
 }
 
-# Attach the Policy to the Role
+# Attach the Policy to the step functions state machine assuming role
 resource "aws_iam_role_policy_attachment" "stepfunction_lambda_policy_attachment" {
   role       = aws_iam_role.state_lambda_role.name
   policy_arn = aws_iam_policy.stepfunction_lambda_policy.arn
 }
 
-//Set up terraform IAMS for Eventbridge - Step Functions - one eventbridge for entire project(ETL)
+//Set up terraform IAMS for Eventbridge using Step Functions - one eventbridge for entire project(ETL)
 data "aws_iam_policy_document" "eventbridge_step_functions_policy_document" {
     statement {
             actions= [
