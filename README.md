@@ -137,24 +137,8 @@ END OF DAY: Terraform destroy!
 - [Sarah Dankwa](https://github.com/Sarah-Dankwa)
 - [Northcoders](https://github.com/northcoders)
 
-## badges
-![deploy workflow](https://github.com/Mohan0501/de-alapin-totesys/actions/workflows/deploy.yml/badge.svg)
 
-![pandas](https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
-
-![pandas](https://img.shields.io/badge/Pandas-2C2D72?style=for-the-badge&logo=pandas&logoColor=white)
-
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
-
-![python](https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue)
-
-![terraform](https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
-
-[![Trello](https://img.shields.io/badge/Trello-0052CC?style=for-the-badge&logo=trello&logoColor=white)](https://trello.com/b/mk8ELtrn/7dealapintoteskanban)
-
-![coverage](https://gitlab.example.com/Mohan0501/de-alapin-totesys/badges/main/coverage.svg)
-
-Project Repo
+## Further Setup information
 
 ###########PROJECT##############
 
@@ -229,4 +213,25 @@ Where applicable AWS Moto mocking should be applied
 
 checks will be performed upon pull requests and push to main.
 
+## Badges
+![deploy workflow](https://github.com/Mohan0501/de-alapin-totesys/actions/workflows/deploy.yml/badge.svg)
 
+![Amazon AWS](https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
+
+![GitHub Actions](https://img.shields.io/badge/Github%20Actions-282a2e?style=for-the-badge&logo=githubactions&logoColor=367cfe)
+
+![pandas](https://img.shields.io/badge/Pandas-2C2D72?style=for-the-badge&logo=pandas&logoColor=white)
+
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+
+![python](https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue)
+
+![slack](https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=slack&logoColor=white)
+
+![terraform](https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
+
+[![Trello](https://img.shields.io/badge/Trello-0052CC?style=for-the-badge&logo=trello&logoColor=white)](https://trello.com/b/mk8ELtrn/7dealapintoteskanban)
+
+![vscode](https://img.shields.io/badge/VSCode-0078D4?style=for-the-badge&logo=visual%20studio%20code&logoColor=white)
+
+<!-- ![coverage](https://gitlab.example.com/Mohan0501/de-alapin-totesys/badges/main/coverage.svg) -->
