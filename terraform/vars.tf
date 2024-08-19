@@ -17,3 +17,13 @@ variable "state_machine_name" {
   type    = string
   default = "totesys-workflow-"
 }
+
+variable "metric_namespace" {
+  type = string
+  default = "alapin_extract_metric"
+}
+
+variable "alarm_name" {
+  type = string
+  default = "terraform-extract-metric-alarm"
+}

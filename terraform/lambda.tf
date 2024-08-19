@@ -56,7 +56,7 @@ resource "aws_lambda_function" "workflow_tasks_extract" {
 resource "aws_lambda_function" "workflow_tasks_transform" {
   function_name    = var.transform_lambda
   source_code_hash = data.archive_file.transform_lambda.output_base64sha256
-  role             = aws_iam_role.lambda_role.arn
+  role             = aws_iam_role.transform_lambda_role.arn
   handler          = "${var.transform_lambda}.lambda_handler"
   runtime          = "python3.12"
   timeout          = 120
@@ -68,7 +68,7 @@ resource "aws_lambda_function" "workflow_tasks_transform" {
   layers           = [aws_lambda_layer_version.dependencies.arn,
                       "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python312:12"]
 
-  depends_on = [aws_s3_object.lambda_code]
+  depends_on = [aws_s3_object.lambda_code, aws_s3_object.lambda_layer]
 
   environment {
     variables = {
