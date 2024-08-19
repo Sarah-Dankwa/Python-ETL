@@ -6,9 +6,9 @@ load_dotenv('.env')
 
 def connect_to_db():
     return Connection(
-        user=os.getenv("PG_USER"),
-        password=os.getenv("PG_PASSWORD"),
-        database=os.getenv("PG_DATABASE"),
-        host=os.getenv("PG_HOST"),
-        port=int(os.getenv("PG_PORT"))
+        user=os.getenv("LOCAL_USER"),
+        password=os.getenv("LOCAL_PASSWORD"),
+        database=os.getenv("LOCAL_DATABASE"),
+        host=os.getenv("LOCAL_HOST"),
+        port=int(os.getenv("LOCAL_PORT"))
     )

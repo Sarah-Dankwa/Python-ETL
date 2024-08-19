@@ -138,7 +138,8 @@ data "aws_iam_policy_document" "cloudwatch_sns_policy_document" {
     ]
 
     resources = [
-      "arn:aws:sns:eu-west-2:590183674561:user-updates-topic"
+      "arn:aws:sns:eu-west-2:590183674561:*"  #apply to all sns topics in specified region
+
     ]
   }
 }
@@ -179,9 +180,9 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_sns_policy_attachment" {
   policy_arn = aws_iam_policy.cloudwatch_sns_policy.arn
 }
 
-// Creating a terraform IAMS role for Lambda, cloudwatch and eventbridge
+// Creating a terraform IAMS role for step functions state machine
 resource "aws_iam_role" "state_lambda_role" {
-    name_prefix = "role-${var.extract_lambda}"
+    name_prefix = "role-${var.state_machine_name}"
     assume_role_policy = <<EOF
     {
         "Version": "2012-10-17",
@@ -202,12 +203,14 @@ resource "aws_iam_role" "state_lambda_role" {
     EOF
 }
 
-//Set up terraform IAMS for Step Functions - Lambda
+//Set up terraform IAMS for Step Functions using Lambda
 data "aws_iam_policy_document" "stepfunctions_lambda_policy_document" {
     statement {
             effect= "Allow"
             actions= [
-                "lambda:InvokeFunction"
+                "lambda:InvokeFunction",
+                "lambda:CreateLayerVersion",
+                "lambda:DeleteLayerVersion"
             ]
             resources = [
                 "arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:${var.extract_lambda}",
@@ -224,20 +227,21 @@ resource "aws_iam_policy" "stepfunction_lambda_policy" {
   policy = data.aws_iam_policy_document.stepfunctions_lambda_policy_document.json
 }
 
-# Attach the Policy to the Role
+# Attach the Policy to the step functions state machine assuming role
 resource "aws_iam_role_policy_attachment" "stepfunction_lambda_policy_attachment" {
   role       = aws_iam_role.state_lambda_role.name
   policy_arn = aws_iam_policy.stepfunction_lambda_policy.arn
 }
 
-//Set up terraform IAMS for Eventbridge - Step Functions - one eventbridge for entire project(ETL)
+//Set up terraform IAMS for Eventbridge using Step Functions - one eventbridge for entire project(ETL)
 data "aws_iam_policy_document" "eventbridge_step_functions_policy_document" {
     statement {
             actions= [
              "states:StartExecution"
              ]
             resources= [
-                "arn:aws:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:event-bus/*" #needs to update with step function name instead of *
+                # "arn:aws:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:event-bus/*" #needs to update with step function name instead of *
+                "arn:aws:states:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:stateMachine:${var.state_machine_name}"
             ]
             effect= "Allow"
         }

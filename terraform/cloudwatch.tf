@@ -6,7 +6,8 @@ resource "aws_cloudwatch_log_metric_filter" "error_extract_metric_filter" {
 
   metric_transformation {
     name      = "ErrorCount"
-    namespace = "alapin_extract_metric"
+    # namespace = "alapin_extract_metric"
+    namespace = var.metric_namespace
     value     = "1"
   }
 }
@@ -18,7 +19,8 @@ resource "aws_cloudwatch_log_group" "alapin_extract_log_group" {
 
 //Creating cloudwatch metric alarm
 resource "aws_cloudwatch_metric_alarm" "extract_metric_alarm" {
-  alarm_name                = "terraform-extract-metric-alarm"
+  # alarm_name                = "terraform-extract-metric-alarm"
+  alarm_name                = var.alarm_name
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = 1
   metric_name               = "ErrorCount"
@@ -31,3 +33,4 @@ resource "aws_cloudwatch_metric_alarm" "extract_metric_alarm" {
   actions_enabled           = true
   insufficient_data_actions = []
 }
+
