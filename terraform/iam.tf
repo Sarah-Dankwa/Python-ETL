@@ -134,14 +134,12 @@ data "aws_iam_policy_document" "cloudwatch_sns_policy_document" {
     effect = "Allow"
 
     actions = [
-      "sns:CreateTopic",
-      "sns:Subscribe",
-      "sns:Publish",
-      "sns:DeleteTopic"
+      "sns:Publish"
     ]
 
     resources = [
-      "arn:aws:sns:*:*:*"  #apply to all sns topics
+      "arn:aws:sns:eu-west-2:590183674561:user-updates-topic" 
+
     ]
   }
 }

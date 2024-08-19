@@ -29,26 +29,8 @@ resource "aws_cloudwatch_metric_alarm" "extract_metric_alarm" {
   statistic                 = "Sum"
   threshold                 = 1
   alarm_description         = "This metric monitors ERROR in loggroup"
-  alarm_actions             = [aws_sns_topic.extract_metric_alarm_updates.arn]
+  alarm_actions             = ["arn:aws:sns:eu-west-2:590183674561:user-updates-topic"]
+  actions_enabled           = true
   insufficient_data_actions = []
 }
 
-
-// Create a SNS topic
-resource "aws_sns_topic" "extract_metric_alarm_updates" {
-  # name = "user-updates-topic"
-  name = "new-user-updates-topic"
-}
-
-// Create a new SNS topic
-# resource "aws_sns_topic" "transform_metric_alarm_updates" {
-#   name = "transform-user-updates-topic"
-# }
-
-//Create a SNS topic subscription
-resource "aws_sns_topic_subscription" "extract_metric_alarm_email_target" {
-  for_each  = toset(["mohan0501@gmail.com", "beveridgerr@gmail.com", "jess.marcell@gmail.com", "sarah_dankwa@hotmail.co.uk", "hanawang346@gmail.com"])
-  topic_arn = aws_sns_topic.extract_metric_alarm_updates.arn
-  protocol  = "email"
-  endpoint  = each.value
-}
