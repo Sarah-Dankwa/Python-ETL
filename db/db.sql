@@ -1,2 +1,2 @@
-DROP DATABASE IF EXISTS test_rds;
-CREATE DATABASE test_rds;
+DROP DATABASE IF EXISTS test_warehouse;
+CREATE DATABASE test_warehouse;

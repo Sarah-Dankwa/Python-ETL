@@ -1,10 +1,13 @@
 from db.seed import seed
-from db.connection import db
+from db.connection import connect_to_db
 
+db = None
 try:
+    db = connect_to_db()
     seed()
 except Exception as e:
     print(e)
 finally:
-    db.close()
+    if db:
+        db.close()
     
