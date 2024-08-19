@@ -36,9 +36,14 @@ resource "aws_cloudwatch_metric_alarm" "extract_metric_alarm" {
 
 // Create a SNS topic
 resource "aws_sns_topic" "extract_metric_alarm_updates" {
-  name = "user-updates-topic"
+  # name = "user-updates-topic"
+  name = "new-user-updates-topic"
 }
 
+// Create a new SNS topic
+# resource "aws_sns_topic" "transform_metric_alarm_updates" {
+#   name = "transform-user-updates-topic"
+# }
 
 //Create a SNS topic subscription
 resource "aws_sns_topic_subscription" "extract_metric_alarm_email_target" {
