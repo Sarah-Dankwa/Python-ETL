@@ -110,8 +110,9 @@ def get_table_names():
         WHERE table_schema = 'public';"""
 
         results = db.run(query)
-        table_names = [row[0] for row in results if row != ["_prisma_migrations"]]
         # The prisma_migrations table is also retrieved by the query and thus needs to be excluded from the list
+        table_names = [row[0] for row in results if row != ["_prisma_migrations"]]
+        
 
     except (DatabaseError, AttributeError) as e:
 
@@ -160,7 +161,7 @@ def fetch_from_db(fetch_date=None):
     '''
     This function retrieves the table names from the get table names function
     and checks that the correct number of tables are present (11).
-    If the list has the correct length then it proceeds to fetch the data 
+    If the list of table names is the correct length then it proceeds to fetch the data 
     from the database corresponding to the names, converts the data to parquet using the given function, 
     and saves each file in a given bucket using a specific folder organisation.
     It will return a list of which parquet files have been added to the bucket.
@@ -219,7 +220,7 @@ def lambda_handler(event=None, context=None):
     If the bucket is not empty then the datetime parameter is retrieved from the store and 
     passed to the fetch from db function which filters out the data based on creation date.
     A new datetime parameter then overwrites the previous one.
-    This ensures that only current data is being retrieved from the database
+    This ensures that only current data is being retrieved from the database.
     '''
 
     if not BUCKET_NAME:
