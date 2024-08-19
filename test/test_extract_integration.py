@@ -175,6 +175,7 @@ class TestLambdaHandler:
     @patch("src.extract.save_datetime_parameter")
     @patch("src.extract.fetch_from_db")
     @patch("src.extract.list_bucket_objects", return_value=0)
+    @patch("src.extract.BUCKET_NAME", "")
     def test_lambda_handler_logs_error_if_no_bucket_value(
         self,
         mock_list_objects,
