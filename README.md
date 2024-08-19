@@ -233,5 +233,3 @@ checks will be performed upon pull requests and push to main.
 [![Trello](https://img.shields.io/badge/Trello-0052CC?style=for-the-badge&logo=trello&logoColor=white)](https://trello.com/b/mk8ELtrn/7dealapintoteskanban)
 
 ![vscode](https://img.shields.io/badge/VSCode-0078D4?style=for-the-badge&logo=visual%20studio%20code&logoColor=white)
-
-<!-- ![coverage](https://gitlab.example.com/Mohan0501/de-alapin-totesys/badges/main/coverage.svg) -->
