@@ -1,20 +1,20 @@
 from db.connection import connect_to_db
-from pg8000.native import literal
+from pg8000.native import identifier
 
 def seed():
     db = connect_to_db()
     tables = [
-        'fact_sales_order',
         'dim_date',
         'dim_staff',
         'dim_location',
         'dim_currency',
         'dim_design',
-        'dim_counterparty'
+        'dim_counterparty',
+        'fact_sales_order',
     ]
 
     for table in tables:
-        db.run(f'DROP TABLE IF EXISTS {literal(table)}')
+        db.run(f'DROP TABLE IF EXISTS {identifier(table)};')
     
     queries = get_queries()
     for query in queries:
@@ -66,18 +66,18 @@ def get_queries():
         last_name VARCHAR,
         department_name VARCHAR NOT NULL,
         location VARCHAR NOT NULL,
-        email_address email_address NOT NULL
+        email_address VARCHAR NOT NULL
     );'''
 
     dim_location = '''
     CREATE TABLE dim_location (
-        location_id INT PRIMARY KEYNOT NULL,
+        location_id INT PRIMARY KEY NOT NULL,
         address_line_1 VARCHAR NOT NULL,
         address_line_2 VARCHAR,
         district VARCHAR,
         city VARCHAR NOT NULL,
         postal_code VARCHAR NOT NULL,
-        country VARCHAR NOT NULL
+        country VARCHAR NOT NULL,
         phone VARCHAR NOT NULL
     );
     '''
