@@ -24,7 +24,7 @@ def seed():
 
 
 def get_queries():
-    '''queries to create expected tables in mock database'''
+    '''queries to create expected tables in mock data warehouse'''
 
     fact_sales_order = '''
     CREATE TABLE fact_sales_order (
@@ -61,22 +61,22 @@ def get_queries():
 
     dim_staff = '''
     CREATE TABLE dim_staff (
-    staff_id INT NOT NULL,
-    first_name VARCHAR NOT NULL
-    last_name VARCHAR
-    department_name VARCHAR NOT NULL
-    location VARCHAR NOT NUL
-    email_address email_address NOT NULL
+        staff_id INT NOT NULL,
+        first_name VARCHAR NOT NULL,
+        last_name VARCHAR,
+        department_name VARCHAR NOT NULL,
+        location VARCHAR NOT NULL,
+        email_address email_address NOT NULL
     );'''
 
     dim_location = '''
     CREATE TABLE dim_location (
-        location_id INT PRIMARY KEYNOT NULL
-        address_line_1 VARCHAR NOT NULL
-        address_line_2 VARCHAR
-        district VARCHAR
-        city VARCHAR NOT NULL
-        postal_code VARCHAR NOT NULL
+        location_id INT PRIMARY KEYNOT NULL,
+        address_line_1 VARCHAR NOT NULL,
+        address_line_2 VARCHAR,
+        district VARCHAR,
+        city VARCHAR NOT NULL,
+        postal_code VARCHAR NOT NULL,
         country VARCHAR NOT NULL
         phone VARCHAR NOT NULL
     );
@@ -84,18 +84,19 @@ def get_queries():
 
     dim_currency = '''
     CREATE TABLE dim_currency (
-        currency_id INT PRIMARY KEY NOT NULL
-        currency_code VARCHAR NOT NULL
+        currency_id INT PRIMARY KEY NOT NULL,
+        currency_code VARCHAR NOT NULL,
         currency_name VARCHAR NOT NULL
     );
     '''
 
     dim_design='''
-    Table dim_design as D{
-    design_id int [pk, not null]
-    design_name varchar [not null]
-    file_location varchar [not null]
-    file_name varchar [not null]
+    CREATE TABLE dim_design(
+        design_id int PRIMARY KEY NOT NULL,
+        design_name VARCHAR NOT NULL,
+        file_location VARCHAR NOT NULL,
+        file_name VARCHAR NOT NULL
+    );
     '''
 
     dim_counterparty = '''
