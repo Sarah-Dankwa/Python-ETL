@@ -138,7 +138,7 @@ data "aws_iam_policy_document" "cloudwatch_sns_policy_document" {
     ]
 
     resources = [
-      "arn:aws:sns:eu-west-2:590183674561:*"  #apply to all sns topics in specified region
+      "arn:aws:sns:eu-west-2:590183674561:user-updates-topic" 
 
     ]
   }
