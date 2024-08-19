@@ -1,4 +1,100 @@
 # de-alapin-totesys
+
+# Totesys - ETL Pipeline
+
+Final project in Northcoders Data Engineering Bootcamp: a data pipeline for a company selling tote bags. The brief is to create a data pipeline that will **extract** data from a pre-populated Totesys OLTP database. It archives this data in an AWS hosted data lake then **transforms** this data into a provided database schema, then **loads** it into a data warehouse hosted in AWS.
+
+## Installation
+
+Run make requirements to install all the python dependencies.
+
+```bash
+make requirements
+```
+
+Export AWS credentials to terminal to ensure terraform deploys to correct account and access to secret manager:
+Credentials will be shared by AWS user with shared account
+
+	export AWS_ACCESS_KEY_ID=<accesskey>
+	export AWS_SECRET_ACCESS_KEY=<secret accesskey>
+	export AWS_DEFAULT_REGION=eu-west-2
+
+Then run terraform init
+
+```bash
+terraform init
+```
+
+## Execution and Usage
+
+
+
+## Used Technologies
+
+**Programming**
+- Python
+- Makefile
+
+**Amazon Web Services**
+- Alerts & Metrics
+- Cloudwatch
+- IAMs
+- Lambda
+- S3 Buckets
+- Secrets Manager
+- SSM Parameter Store
+- Step functions
+
+**Data Modelling**
+- PostgreSQL
+- pg8000 python library
+- pandas libraray
+
+**DevOps**
+- Terraform
+- Makefile
+- GitHub Actions
+- GitHub Secrets
+
+**Testing**
+- Pytest
+- TDD
+- Mocking & Patching
+
+## Current Features
+## Contributing
+
+Export AWS credentials to terminal to ensure terraform deploys to correct account and access to secret manager:
+Credentials will be shared by AWS user with shared account
+
+	export AWS_ACCESS_KEY_ID=<accesskey>
+	export AWS_SECRET_ACCESS_KEY=<secret accesskey>
+	export AWS_DEFAULT_REGION=eu-west-2
+
+
+Makefile
+- make requirements (only once or when pip list updated)
+- make dev setup
+- make run-checks
+
+Ensure venv is active and python path exported
+- source venv/bin/activate
+- export PYTHONPATH=$(pwd)
+
+
+END OF DAY: Terraform destroy!
+
+## Contributors
+- [Alex Beveridge](https://github.com/bevs55)
+- [Hanna Wang](https://github.com/Hana-Wang)
+- [Jessica Marcell](https://github.com/Pringading)
+- [Mohankumar Nanjegowda](https://github.com/Mohan0501)
+- [Sarah Dankwa](https://github.com/Sarah-Dankwa)
+- [Northcoders](https://github.com/northcoders)
+
+## badges
+![example workflow](https://github.com/github/docs/actions/workflows/main.yml/badge.svg)
+
 Project Repo
 
 ###########PROJECT##############
