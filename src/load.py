@@ -1,11 +1,15 @@
-from pg8000.native import Connection
+from pg8000.native import Connection, DatabaseError
 import boto3
 import pandas as pd
 import os
+import json
+import logging
 
 
 BUCKET_NAME = os.environ["DATA_PROCESSED_BUCKET_NAME"]
 
+logger = logging.getLogger()
+logging.getLogger().setLevel(logging.INFO)
 
 def get_warehouse_credentials() -> dict:
     """returns credentials for the data warehouse as dictionary
@@ -14,7 +18,17 @@ def get_warehouse_credentials() -> dict:
         dictionary of aws credentials to access the data warehouse
     """
 
-    pass
+    secret_name = 'totesys-warehouse'
+    client = boto3.client('secretsmanager')
+    try:
+        get_secret_value = client.get_secret_value(SecretId=secret_name)
+        secret = get_secret_value['SecretString']
+        secret_dict = json.loads(secret)
+        return secret_dict
+    
+    except client.exceptions.ResourceNotFoundException as e:
+        if e.response['Error']["Code"] == "ResourceNotFoundException":
+            logger.error(f"The database [{secret_name}] could not be found")
 
 
 def get_latest_data_for_one_table(object_key: str) -> list[dict]:
@@ -31,9 +45,21 @@ def get_latest_data_for_one_table(object_key: str) -> list[dict]:
 
 
 def db_connection() -> Connection:
-    """returns connection to the data warehouse"""
+    ''' This function connects to the data warehouse hosted in the cloud 
+    using the credentials stored in aws.
+    It logs an error if the connection fails.'''
 
-    pass
+    try:
+        secret = get_warehouse_credentials()
+        return Connection(
+            user=secret["Username"],
+            database=secret["Database"],
+            password=secret["Password"],
+            host=secret["Hostname"],
+            port=secret["Port"],
+        )
+    except InterfaceError as e:
+        logger.error("NO CONNECTION TO DATABASE - PLEASE CHECK")
 
 
 def insert_new_data_into_data_warehouse(data: dict, object_key: str):
