@@ -73,3 +73,49 @@ resource "aws_iam_role_policy_attachment" "tranform_lambda_role_cw_policy" {
 
 #######set up iam permissions for cloudwatch using sns
 ###it is already in iam.tf, anything else need to be added?
+
+# Set up terraform IAMS role for Lambda 
+# Create an IAMS role for the transform lambda which will have different policies attached to it
+# &&
+# Set up terraform IAMS permissions for Lambda - S3
+# Create the following policy and attach to Lambda role:
+# Read and write to S3
+
+// create policy document of using processed_data_bucket in aws s3
+data "aws_iam_policy_document" "s3_document_transform"{
+    statement {
+
+        effect = "Allow"
+        actions = ["s3:PutObject",
+                   "s3:GetObject",
+                   "s3:ListBucket",
+                   "s3:DeleteObject"]
+
+        resources = [
+            "${aws_s3_bucket.processed_data_bucket.arn}/*",
+            "${aws_s3_bucket.processed_data_bucket.arn}"
+        ]       
+    }
+
+}
+
+
+//Create the IAM policy using the s3 policy document for transform lambda assuming role
+resource "aws_iam_policy" "s3_policy_transform" {
+    name_prefix = "s3-policy-${var.transform_lambda}"
+    description = "transform lambda policy for S3 read/write access "
+    policy = data.aws_iam_policy_document.s3_document_transform.json
+}
+
+
+# Attach the Policy to the transform lambda assuming role
+resource "aws_iam_role_policy_attachment" "s3_policy_attachement_transform" {
+    role = aws_iam_role.transform_lambda_role.name
+    policy_arn = aws_iam_policy.s3_policy_transform.arn
+  
+}
+
+
+
+
+
