@@ -17,9 +17,10 @@ from src.load import (
     lambda_handler,
 )
 
+
 @pytest.fixture
 def valid_warehouse_credentials(aws_credentials, environment_variables):
-    """mock boto3 secretsmanager client with warehouse credentials from local 
+    """mock boto3 secretsmanager client with warehouse credentials from local
     .env"""
     secret = {}
     secret["Database"] = os.environ["LOCAL_DATABASE"]
@@ -69,8 +70,9 @@ class TestGetWarehouseCredentials:
     """tests for the get warehouse credentials function"""
 
     @pytest.mark.it("returns a dictionary")
-    def test_warehouse_credentials_returns_a_dictionary(self, valid_warehouse_credentials):
-
+    def test_warehouse_credentials_returns_a_dictionary(
+        self, valid_warehouse_credentials
+    ):
         response = get_warehouse_credentials()
         assert isinstance(response, dict)
 
@@ -90,32 +92,30 @@ class TestGetWarehouseCredentials:
     ):
         with caplog.at_level(logging.INFO):
             get_warehouse_credentials()
-            print('print >> ', caplog.text)
             assert "The database [totesys-warehouse] could not be found" in caplog.text
-
-
-class TestGetLatestDataForOneTable:
-    """tests for the get latest data for one table function"""
-
-    @pytest.mark.skip("need a test parquet file to ")
-    @pytest.mark.it("function returns a list of dictionaries")
-    def test_function_returns_a_list_of_dictionaries(self, s3_client):
-        pass
 
 
 class TestDBConnection:
     """tests for the db connection function"""
 
-    @pytest.mark.it('Test db connection connects to database')
+    @pytest.mark.it("Test db connection connects to database")
     def test_connection_to_db(self, secretsmanager_client):
         db = connect_to_db()
         assert isinstance(db, Connection)
 
-    @pytest.mark.it('Logs an error if unable to connect to database')
+    @pytest.mark.it("Logs an error if unable to connect to database")
     def test_logs_an_error(self, invalid_warehouse_credentials, caplog):
         with caplog.at_level(logging.INFO):
-            connect_to_db()
-            assert 'NO CONNECTION TO DATABASE - PLEASE CHECK' in caplog.text
+            db_connection()
+            assert "NO CONNECTION TO DATABASE - PLEASE CHECK" in caplog.text
+
+
+class TestGetLatestDataForOneTable:
+    """tests for the get latest data for one table function"""
+
+    @pytest.mark.it("function returns a list of dictionaries")
+    def test_function_returns_a_list_of_dictionaries(self, s3_client):
+        pass
 
 
 class TestInsertNewDataIntoWarehouse:

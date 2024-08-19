@@ -11,6 +11,7 @@ BUCKET_NAME = os.environ["DATA_PROCESSED_BUCKET_NAME"]
 logger = logging.getLogger()
 logging.getLogger().setLevel(logging.INFO)
 
+
 def get_warehouse_credentials() -> dict:
     """returns credentials for the data warehouse as dictionary
 
@@ -18,21 +19,21 @@ def get_warehouse_credentials() -> dict:
         dictionary of aws credentials to access the data warehouse
     """
 
-    secret_name = 'totesys-warehouse'
-    client = boto3.client('secretsmanager')
+    secret_name = "totesys-warehouse"
+    client = boto3.client("secretsmanager")
     try:
         get_secret_value = client.get_secret_value(SecretId=secret_name)
-        secret = get_secret_value['SecretString']
+        secret = get_secret_value["SecretString"]
         secret_dict = json.loads(secret)
         return secret_dict
-    
+
     except client.exceptions.ResourceNotFoundException as e:
-        if e.response['Error']["Code"] == "ResourceNotFoundException":
+        if e.response["Error"]["Code"] == "ResourceNotFoundException":
             logger.error(f"The database [{secret_name}] could not be found")
 
 
 def db_connection() -> Connection:
-    ''' This function connects to the data warehouse hosted in the cloud 
+    '''This function connects to the data warehouse hosted in the cloud
     using the credentials stored in aws.
     It logs an error if the connection fails.'''
 
@@ -58,14 +59,11 @@ def get_latest_data_for_one_table(object_key: str) -> list[dict]:
     Returns:
         list with one dictionary for each row in the table
     """
-
+    
     pass
 
 
-
-
-
-def insert_new_data_into_data_warehouse(data: dict, object_key: str):
+def insert_new_data_into_data_warehouse(data: list, object_key: str):
     """inserts data from dictionary into a table in the data warehouse
 
     Args:

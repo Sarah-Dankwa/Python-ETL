@@ -23,10 +23,10 @@ time = now.strftime("%H:%M:%S")
 
 
 def get_database_credentials():
-    '''
+    """
     This function retrieves the credentials from aws secrets managager
     for a database hosted in the cloud
-    '''
+    """
     secret_name = "totesys-database"
     client = boto3.client("secretsmanager")
     try:
@@ -41,11 +41,11 @@ def get_database_credentials():
 
 
 def connect_to_db():
-    '''
-    This function connects to the database hosted in the cloud 
+    """
+    This function connects to the database hosted in the cloud
     using the credentials stored in aws.
     It logs an error if the connection fails.
-    '''
+    """
     try:
         secret = get_database_credentials()
         return Connection(
@@ -60,13 +60,13 @@ def connect_to_db():
 
 
 def get_single_table(table_name, fetch_date=None):
-    '''
+    """
     This function selects all rows from a given table in the database.
     If a fetch date is passed to the function then the rows are
     filtered based on their time of creation.
-    The sql query returns a list of lists and this is 
+    The sql query returns a list of lists and this is
     zipped with the column names into a dictionary and returned by the function.
-    '''
+    """
     db = None
     try:
         db = connect_to_db()
@@ -89,17 +89,17 @@ def get_single_table(table_name, fetch_date=None):
 
 
 def convert_to_parquet(result, filename):
-    '''
+    """
     This function takes the result of the get single table function,
     converts the dictionary into a pandas dataframe and then converts that into parquet format.
-    '''
+    """
     df = pd.DataFrame(result)
     df.to_parquet(filename, index=False)
 
 
 def get_table_names():
-    '''
-    This function retrieves the tables names from the schema in the database and returns them in a list'''
+    """
+    This function retrieves the tables names from the schema in the database and returns them in a list"""
     db = None
     table_names = []
     try:
@@ -112,7 +112,6 @@ def get_table_names():
         results = db.run(query)
         # The prisma_migrations table is also retrieved by the query and thus needs to be excluded from the list
         table_names = [row[0] for row in results if row != ["_prisma_migrations"]]
-        
 
     except (DatabaseError, AttributeError) as e:
 
@@ -125,9 +124,9 @@ def get_table_names():
 
 
 def save_datetime_parameter(now):
-    '''
+    """
     This function saves a string casted datetime parameter to the AWS paramter store
-    '''
+    """
     client = boto3.client("ssm")
     client.put_parameter(
         Name="latest-extract", Type="String", Value=str(now), Overwrite=True
@@ -135,9 +134,9 @@ def save_datetime_parameter(now):
 
 
 def retrieve_datetime_parameter():
-    '''
+    """
     This function retrieves the datetime paramter stored in the AWS parameter store
-    '''
+    """
     client = boto3.client("ssm")
     try:
         extract_datetime = client.get_parameter(Name="latest-extract")
@@ -148,24 +147,24 @@ def retrieve_datetime_parameter():
 
 
 def list_bucket_objects():
-    '''
-    This function lists the objects present in the bucket passed to the 
+    """
+    This function lists the objects present in the bucket passed to the
     lambda function as an environment variable
-    '''
+    """
     client = boto3.client("s3")
     bucket_objects = client.list_objects_v2(Bucket=BUCKET_NAME)
     return bucket_objects["KeyCount"]
 
 
 def fetch_from_db(fetch_date=None):
-    '''
+    """
     This function retrieves the table names from the get table names function
     and checks that the correct number of tables are present (11).
-    If the list of table names is the correct length then it proceeds to fetch the data 
-    from the database corresponding to the names, converts the data to parquet using the given function, 
+    If the list of table names is the correct length then it proceeds to fetch the data
+    from the database corresponding to the names, converts the data to parquet using the given function,
     and saves each file in a given bucket using a specific folder organisation.
     It will return a list of which parquet files have been added to the bucket.
-    '''
+    """
     bucket_name = BUCKET_NAME
     client = boto3.client("s3")
     table_names = get_table_names()
@@ -211,17 +210,17 @@ def fetch_from_db(fetch_date=None):
 
 
 def lambda_handler(event=None, context=None):
-    '''
+    """
     The lambda function first checks that the given bucket has been
     passed as an environment variable, then checks if that bucket is empty or has items in it.
     If the bucket is empty it will use the fetch from db function to retrieve the data.
     This will do a full fetch of the database as no fetch date is provided meaning the data is not filtered.
     It then stores the current time in the parameter store.
-    If the bucket is not empty then the datetime parameter is retrieved from the store and 
+    If the bucket is not empty then the datetime parameter is retrieved from the store and
     passed to the fetch from db function which filters out the data based on creation date.
     A new datetime parameter then overwrites the previous one.
     This ensures that only current data is being retrieved from the database.
-    '''
+    """
 
     if not BUCKET_NAME:
         logger.error("BUCKET NOT FOUND - PLEASE CHECK")
