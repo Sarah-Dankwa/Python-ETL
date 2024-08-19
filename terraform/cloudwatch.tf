@@ -6,7 +6,8 @@ resource "aws_cloudwatch_log_metric_filter" "error_extract_metric_filter" {
 
   metric_transformation {
     name      = "ErrorCount"
-    namespace = "alapin_extract_metric"
+    # namespace = "alapin_extract_metric"
+    namespace = var.metric_namespace
     value     = "1"
   }
 }
@@ -18,7 +19,8 @@ resource "aws_cloudwatch_log_group" "alapin_extract_log_group" {
 
 //Creating cloudwatch metric alarm
 resource "aws_cloudwatch_metric_alarm" "extract_metric_alarm" {
-  alarm_name                = "terraform-extract-metric-alarm"
+  # alarm_name                = "terraform-extract-metric-alarm"
+  alarm_name                = var.alarm_name
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = 1
   metric_name               = "ErrorCount"
@@ -34,9 +36,14 @@ resource "aws_cloudwatch_metric_alarm" "extract_metric_alarm" {
 
 // Create a SNS topic
 resource "aws_sns_topic" "extract_metric_alarm_updates" {
-  name = "user-updates-topic"
+  # name = "user-updates-topic"
+  name = "new-user-updates-topic"
 }
 
+// Create a new SNS topic
+# resource "aws_sns_topic" "transform_metric_alarm_updates" {
+#   name = "transform-user-updates-topic"
+# }
 
 //Create a SNS topic subscription
 resource "aws_sns_topic_subscription" "extract_metric_alarm_email_target" {
