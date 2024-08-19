@@ -93,7 +93,19 @@ END OF DAY: Terraform destroy!
 - [Northcoders](https://github.com/northcoders)
 
 ## badges
-![example workflow](https://github.com/github/docs/actions/workflows/main.yml/badge.svg)
+![deploy workflow](https://github.com/Mohan0501/de-alapin-totesys/actions/workflows/deploy.yml/badge.svg)
+
+![pandas](https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
+
+![pandas](https://img.shields.io/badge/Pandas-2C2D72?style=for-the-badge&logo=pandas&logoColor=white)
+
+![python](https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue)
+
+![terraform](https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
+
+[![Trello](https://img.shields.io/badge/Trello-0052CC?style=for-the-badge&logo=trello&logoColor=white)](https://trello.com/b/mk8ELtrn/7dealapintoteskanban)
+
+
 
 Project Repo
 
