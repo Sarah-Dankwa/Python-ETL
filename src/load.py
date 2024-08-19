@@ -1,4 +1,4 @@
-from pg8000.native import Connection, DatabaseError
+from pg8000.native import Connection, InterfaceError
 import boto3
 import pandas as pd
 import os
@@ -31,19 +31,6 @@ def get_warehouse_credentials() -> dict:
             logger.error(f"The database [{secret_name}] could not be found")
 
 
-def get_latest_data_for_one_table(object_key: str) -> list[dict]:
-    """reads parquet file at given key and returns list of dictionaries
-
-    Args:
-        object_key(string): key of a parquet file in transform bucket
-
-    Returns:
-        list with one dictionary for each row in the table
-    """
-
-    pass
-
-
 def db_connection() -> Connection:
     ''' This function connects to the data warehouse hosted in the cloud 
     using the credentials stored in aws.
@@ -60,6 +47,22 @@ def db_connection() -> Connection:
         )
     except InterfaceError as e:
         logger.error("NO CONNECTION TO DATABASE - PLEASE CHECK")
+
+
+def get_latest_data_for_one_table(object_key: str) -> list[dict]:
+    """reads parquet file at given key and returns list of dictionaries
+
+    Args:
+        object_key(string): key of a parquet file in transform bucket
+
+    Returns:
+        list with one dictionary for each row in the table
+    """
+
+    pass
+
+
+
 
 
 def insert_new_data_into_data_warehouse(data: dict, object_key: str):

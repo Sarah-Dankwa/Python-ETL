@@ -106,10 +106,16 @@ class TestGetLatestDataForOneTable:
 class TestDBConnection:
     """tests for the db connection function"""
 
-    @pytest.mark.skip
-    @pytest.mark.it("Test db connection connects to database")
-    def test_connection_to_db(self, valid_warehouse_credentials):
-        pass
+    @pytest.mark.it('Test db connection connects to database')
+    def test_connection_to_db(self, secretsmanager_client):
+        db = connect_to_db()
+        assert isinstance(db, Connection)
+
+    @pytest.mark.it('Logs an error if unable to connect to database')
+    def test_logs_an_error(self, invalid_warehouse_credentials, caplog):
+        with caplog.at_level(logging.INFO):
+            connect_to_db()
+            assert 'NO CONNECTION TO DATABASE - PLEASE CHECK' in caplog.text
 
 
 class TestInsertNewDataIntoWarehouse:
