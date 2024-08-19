@@ -116,6 +116,6 @@ resource "aws_iam_role_policy_attachment" "s3_policy_attachement_transform" {
 }
 
 
-
+# Add terraform SNS topics for email alerts (transform)
 
 

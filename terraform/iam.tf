@@ -184,7 +184,7 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_sns_policy_attachment" {
 
 // Creating a terraform IAMS role for step functions state machine
 resource "aws_iam_role" "state_lambda_role" {
-    name_prefix = "role-${var.extract_lambda}"
+    name_prefix = "role-${var.state_machine_name}"
     assume_role_policy = <<EOF
     {
         "Version": "2012-10-17",
