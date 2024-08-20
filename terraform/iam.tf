@@ -138,10 +138,11 @@ data "aws_iam_policy_document" "cloudwatch_sns_policy_document" {
     ]
 
     resources = [
-      "arn:aws:sns:eu-west-2:590183674561:user-updates-topic" 
+      "arn:aws:sns:eu-west-2:590183674561:user-updates-topic",
+      "arn:aws:sns:eu-west-2:590183674561:totesys-workflow-step-functions-notifications"
+          ]
+    }
 
-    ]
-  }
 }
 //Create the IAM policy using the cloudwatch SNS policy document
 resource "aws_iam_policy" "cloudwatch_sns_policy" {
@@ -174,11 +175,12 @@ resource "aws_iam_role" "cloud_watch_role" {
     EOF
 }
 
-# Attach the Policy to the Role
+# Attach the sns Policy to the cloudwatch assuming Role
 resource "aws_iam_role_policy_attachment" "cloudwatch_sns_policy_attachment" {
   role       = aws_iam_role.cloud_watch_role.name
   policy_arn = aws_iam_policy.cloudwatch_sns_policy.arn
 }
+
 
 // Creating a terraform IAMS role for step functions state machine
 resource "aws_iam_role" "state_lambda_role" {
@@ -232,6 +234,14 @@ resource "aws_iam_role_policy_attachment" "stepfunction_lambda_policy_attachment
   role       = aws_iam_role.state_lambda_role.name
   policy_arn = aws_iam_policy.stepfunction_lambda_policy.arn
 }
+
+
+# Attach the sns Policy to the step functions state machine assuming Role
+resource "aws_iam_role_policy_attachment" "stepfunction_sns_policy_attachment" {
+  role       = aws_iam_role.state_lambda_role.name
+  policy_arn = aws_iam_policy.cloudwatch_sns_policy.arn
+}
+
 
 //Set up terraform IAMS for Eventbridge using Step Functions - one eventbridge for entire project(ETL)
 data "aws_iam_policy_document" "eventbridge_step_functions_policy_document" {
