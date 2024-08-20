@@ -91,7 +91,7 @@ resource "aws_lambda_function" "workflow_tasks_transform" {
   
   # specify layers for the aws lambda function
   layers           = [aws_lambda_layer_version.dependencies.arn,
-                      "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python312:12"]
+                      "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python312:12"] 
    
   # ensure the Lambda function won't be deployed until the lambda code and lambda layers are available in S3
   depends_on = [aws_s3_object.lambda_code, aws_s3_object.lambda_layer]
