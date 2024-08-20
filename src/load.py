@@ -87,4 +87,4 @@ def lambda_handler(event: list, context):
     corresponding table in the data warehouse.
     """
 
-    return {{"statusCode": 200, "body": "Hello test lambda!"}}
+    return {"statusCode": 200, "body": "Hello test lambda!"}
