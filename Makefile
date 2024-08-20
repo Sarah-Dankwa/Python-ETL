@@ -81,6 +81,10 @@ flake8:
 ## Set up dev requirements (bandit, safety, flake8)
 dev-setup: bandit safety black coverage flake8
 
+## Run set up test warehouse database
+setup-db:
+	$(psql -f db/db.sql)
+	
 ## Run the security test (bandit + safety)
 security-test:
 	$(call execute_in_env, safety check -r ./requirements.txt -i 66742 -i 70612)
@@ -95,14 +99,14 @@ run-flake8: dev-setup
 	$(call execute_in_env, flake8  ./src/*.py ./test/*.py)
 
 ## Run the unit tests
-unit-test:
+unit-test: setup-db
 	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -vvv \
 	--ignore=dependencies/python/ \
 	--no-summary \
 	--testdox)
 
 ## Run all tests including test_recorder.py, test_import.py
-unit-test-all:
+unit-test-all: setup-db
 	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -vvv --disable-warnings --testdox --no-summary)
 
 ## Run the coverage check
