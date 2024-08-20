@@ -24,7 +24,8 @@ data "archive_file" "load_lambda" {
 
 // create lambda function with name 'extact' using the zip file 'extract/function.zip' uploaded in s3 bucket
 resource "aws_lambda_function" "workflow_tasks_extract" {
-  # defines the lambda function's name in aws, which is used as identifier for lambda functions
+
+  # Defines the lambda function's name in aws, which is used as identifier for lambda functions
   function_name    = var.extract_lambda  
   
   # This ensures the Lambda function code will only be updated if the hash of the ZIP file changes
@@ -33,7 +34,7 @@ resource "aws_lambda_function" "workflow_tasks_extract" {
   #Specifies the IAM role that the extract Lambda function will assume when it runs, where there is attached permissions of using other resources
   role             = aws_iam_role.lambda_role.arn 
 
-  # define the entry point of the Lambda function 'extract', which is 'lambda_handler()' inside 'extract.py' 
+  # Define the entry point of the Lambda function 'extract', which is 'lambda_handler()' inside 'extract.py' 
   handler          = "${var.extract_lambda}.lambda_handler"  
   runtime          = "python3.12"
   timeout          = 120
@@ -56,8 +57,6 @@ resource "aws_lambda_function" "workflow_tasks_extract" {
   environment {
     variables = {
       DATA_INGESTED_BUCKET_NAME = aws_s3_bucket.ingested_data_bucket.id
-    # DATA_PROCESSED_BUCKET_NAME = aws_s3_bucket.processed_data_bucket.id
-
       KEY_NAME = "ingested_data"
     } 
   }
