@@ -1,0 +1,74 @@
+{
+    "Comment": "AWS Step Functions state machine",
+     "StartAt": "ExtractTaskLambda",
+     "States": {
+         "ExtractTaskLambda": {
+         "Next": "TransformTaskLambda",
+         "Resource": "arn:aws:lambda:eu-west-2:590183674561:function:extract",
+         "Type": "Task",
+         "Retry": [
+             {
+             "ErrorEquals": [
+                 "States.ALL"
+             ],
+             "BackoffRate": 2,
+             "Comment": "Retry 3 times ExtractTaskLambda before errors are caught by Catch block",
+             "IntervalSeconds": 5,
+             "MaxAttempts": 2
+             }
+         ],
+         "Catch": [
+             {
+             "ErrorEquals": [
+                 "States.ALL"
+             ],
+             "Comment": "catch any error in ExtractTaskLambda execution",
+             "ResultPath": "$.errorInfo",
+             "Next": "SendExtractOrTransformFailureNotification"
+             }
+         ]
+         },
+         "SendExtractOrTransformFailureNotification": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::sns:publish",
+            "Parameters": {
+                "TopicArn": "arn:aws:sns:eu-west-2:590183674561:totesys-workflow-step-functions-notifications",
+                "Message": {
+                "Input.$": "$",
+                "Error.$": "$.errorInfo"
+                },
+                "Subject": "Step Function Failure Notification",
+                "MessageAttributes": {
+                "workflow": {
+                    "DataType": "String",
+                    "StringValue": "totesys-workflow-state-machine"
+                }
+                }
+            },
+         "Next": "FailState"
+         },
+         "FailState": {
+         "Type": "Fail",
+         "Error": "ExtractTaskFailed",
+         "Cause": "Extract Lambda function failed after retries"
+         },
+         "TransformTaskLambda": {
+         "Next": "LoadTaskLambda",
+         "Resource": "arn:aws:lambda:eu-west-2:590183674561:function:transform",
+         "Type": "Task",
+         "Catch": [
+            {
+              "ErrorEquals": ["States.ALL"],
+              "Comment": "catch any error in TransformTaskLambda execution",
+              "ResultPath": "$.errorInfo",
+              "Next": "SendExtractOrTransformFailureNotification"
+            }
+          ]
+         },
+         "LoadTaskLambda": {
+         "End": true,
+         "Resource": "arn:aws:lambda:eu-west-2:590183674561:function:load",
+         "Type": "Task"
+         }
+     }
+} 
