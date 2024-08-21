@@ -1,4 +1,6 @@
-from pg8000.native import Connection, InterfaceError, identifier, literal
+from pg8000.native import Connection, identifier, literal
+from pg8000.exceptions import DatabaseError, InterfaceError
+from botocore.exceptions import ClientError
 import boto3
 import pandas as pd
 import os
@@ -62,12 +64,17 @@ def get_latest_data_for_one_table(object_key: str) -> list:
     """
 
     s3 = boto3.client('s3')
-    obj = s3.get_object(Bucket=BUCKET_NAME, Key=object_key)
-    # reads the content of the s3 object as a binary stream
-    buffer = BytesIO(obj['Body'].read())
-    # saves buffer object to pandas dataframe
-    df = pd.read_parquet(buffer) 
-    return df
+    try:
+        obj = s3.get_object(Bucket=BUCKET_NAME, Key=object_key)
+        # reads the content of the s3 object as a binary stream
+        buffer = BytesIO(obj['Body'].read())
+        # saves buffer object to pandas dataframe
+        df = pd.read_parquet(buffer) 
+        return df
+    except ClientError as e:
+        logger.error(
+            f"Cannot access the parquet file in the processed data bucket: {e}"
+        )
 
 
 def insert_new_data_into_data_warehouse(df: pd.DataFrame, table_name: str):
@@ -98,20 +105,32 @@ def insert_new_data_into_data_warehouse(df: pd.DataFrame, table_name: str):
     # then adds to query
     query += ', '.join(insert_list)
     query += ';'
-    conn = db_connection()
-    conn.run(query)
-    conn.close()
+    conn = None
+    try:
+        conn = db_connection()
+        conn.run(query)
+    except (DatabaseError, AttributeError) as e:
+        logger.error(f"Cannot add data to the database: {e}")
+
+    finally:
+        if conn:
+            conn.close()
+
 
 
 def lambda_handler(event: list, context):
     """adds data from new parquet files in transform bucket to data warehouse
 
     Args:
-        event(list) - list of updated tables
+        event(list) - list of keys of parquet files in transform bucket
         context(json dict) - not used
 
     loops through all new parquet files in transform s3 and inserts data into
     corresponding table in the data warehouse.
     """
 
-    return {"statusCode": 200, "body": "Hello test lambda!"}
+    for key in event:
+        df = get_latest_data_for_one_table(key)
+        if df:
+            table_name = key.split('/')[0]
+            # insert_new_data_into_data_warehouse(df, table_name)
