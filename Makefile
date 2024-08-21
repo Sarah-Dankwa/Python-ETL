@@ -54,6 +54,8 @@ custom-dependencies: create-environment logdirs
 
 	@echo ">>> Installing pg8000 to dependencies/python..."
 	$(call execute_in_env, $(PIP) install pg8000 -t dependencies/python --no-cache-dir)
+	@echo ">>> Installing forex_python to dependencies/python..."
+	$(call execute_in_env, $(PIP) install forex_python -t dependencies/python --no-cache-dir)
 
 all-requirements: requirements custom-dependencies
 ################################################################################################################
