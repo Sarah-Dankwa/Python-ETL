@@ -40,7 +40,7 @@ resource "aws_iam_policy" "cw_policy" {
 }
 
 # Attach the CW Policy to the Extract Role
-resource "aws_iam_role_policy_attachment" "cw_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "cw_policy_attachment_extract" {
     role = aws_iam_role.extract_lambda_role.name
     policy_arn = aws_iam_policy.cw_policy.arn
   

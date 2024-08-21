@@ -24,7 +24,7 @@ resource "aws_iam_role" "load_lambda_role" {
 // Set up terraform IAMS permissions for Lambda - Cloudwatch
 
 # Attach the existing cw policy to the transform lambda role
-resource "aws_iam_role_policy_attachment" "cw_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "cw_policy_attachment_load" {
     role = aws_iam_role.load_lambda_role.name
     policy_arn = aws_iam_policy.cw_policy.arn
 }
