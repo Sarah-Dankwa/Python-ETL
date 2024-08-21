@@ -2,6 +2,7 @@ import pytest
 from dotenv import load_dotenv
 from unittest.mock import patch
 from pg8000.native import Connection
+import pandas as pd
 from db.seed import seed_warehouse
 import json
 import boto3
@@ -14,7 +15,7 @@ from src.load import (
     get_latest_data_for_one_table,
     db_connection,
     insert_new_data_into_data_warehouse,
-    lambda_handler,
+    lambda_handler
 )
 
 
@@ -54,7 +55,7 @@ def invalid_warehouse_credentials(secretsmanager_client_test):
     yield secretsmanager_client_test
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def set_environment_variables():
     """loads environment variables to be used in tests"""
     load_dotenv()
@@ -62,6 +63,12 @@ def set_environment_variables():
 
 @pytest.fixture
 def conn():
+    """connects to local database & adds empty tables
+    
+    yields a connection to the local database 
+    then closes the connection after each test is complete
+    """
+
     db = None
     try:
         db = connect_to_db()
@@ -119,18 +126,42 @@ class TestDBConnection:
 class TestGetLatestDataForOneTable:
     """tests for the get latest data for one table function"""
 
-    @pytest.mark.it("function returns a list of dictionaries")
-    def test_function_returns_a_list_of_dictionaries(self, s3_client):
-        pass
+    @pytest.mark.it("function returns a dataframe")
+    @patch('src.load.BUCKET_NAME', 'test-transformation-bucket')
+    def test_function_returns_a_dataframe(self, s3_client):
+        filename = 'db/data/fact_sales_order.parquet'
+        key = 'test_file.parquet'
+        bucket_name = "test-transformation-bucket"
+        s3_client.upload_file(filename, bucket_name, key)
+        response = get_latest_data_for_one_table(key)
+        assert isinstance(response, pd.DataFrame)
+
+
+    @pytest.mark.it("contents of dataframe equals contents of original file")
+    @patch('src.load.BUCKET_NAME', 'test-transformation-bucket')
+    def test_returns_correct_contents(self, s3_client):
+        filename = 'db/data/fact_sales_order.parquet'
+        key = 'test_file.parquet'
+        bucket_name = "test-transformation-bucket"
+        s3_client.upload_file(filename, bucket_name, key)
+        response = get_latest_data_for_one_table(key)
+        expected = pd.read_parquet(filename)
+        assert response.equals(expected)
 
 
 class TestInsertNewDataIntoWarehouse:
     """tests for insert new data into warehouse function"""
 
-    @pytest.mark.skip
     @pytest.mark.it("inserts data into warehouse")
-    def test_data_is_inserted_into_warehouse(self):
-        pass
+    @patch('src.load.BUCKET_NAME', 'test-transformation-bucket')
+    def test_data_is_inserted_into_warehouse(self, s3_client, valid_warehouse_credentials, conn):
+        filename = 'db/data/fact_sales_order.parquet'
+        key = 'test_file.parquet'
+        bucket_name = "test-transformation-bucket"
+        s3_client.upload_file(filename, bucket_name, key)
+        df = get_latest_data_for_one_table(key)
+        insert_new_data_into_data_warehouse(df, 'fact_sales_order')
+        response = conn.run('SELECT * FROM fact_sales_order LIMIT 5')
 
 
 class TestLambdaHandler:
