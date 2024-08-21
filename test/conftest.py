@@ -115,11 +115,11 @@ def valid_warehouse_credentials(aws_credentials, environment_variables):
     .env"""
 
     secret = {}
-    secret["Database"] = os.environ["LOCAL_DATABASE"]
-    secret["Hostname"] = os.environ["LOCAL_HOST"]
-    secret["Username"] = os.environ["LOCAL_USER"]
-    secret["Password"] = os.environ["LOCAL_PASSWORD"]
-    secret["Port"] = os.environ["LOCAL_PORT"]
+    secret["POSTGRES_DATABASE"] = os.environ["LOCAL_DATABASE"]
+    secret["POSTGRES_HOSTNAME"] = os.environ["LOCAL_HOST"]
+    secret["POSTGRES_USERNAME"] = os.environ["LOCAL_USER"]
+    secret["POSTGRES_PASSWORD"] = os.environ["LOCAL_PASSWORD"]
+    secret["POSTGRES_PORT"] = os.environ["LOCAL_PORT"]
     json_secret = json.dumps(secret)
     with mock_aws():
         client = boto3.client("secretsmanager", region_name="eu-west-2")
@@ -132,13 +132,13 @@ def invalid_warehouse_credentials(secretsmanager_client_test):
     """invalid database connections added to mock secrets manager to test
     error handling
     """
-
+    
     secret = {}
-    secret["Database"] = "invalid_db"
-    secret["Hostname"] = "invalid_host"
-    secret["Username"] = "invalid_user"
-    secret["Password"] = "invalid_password"
-    secret["Port"] = "invalid_port"
+    secret["POSTGRES_DATABASE"] = "invalid_db"
+    secret["POSTGRES_HOSTNAME"] = "invalid_host"
+    secret["POSTGRES_USERNAME"] = "invalid_user"
+    secret["POSTGRES_PASSWORD"] = "invalid_password"
+    secret["POSTGRES_PORT"] = "invalid_port"
     json_secret = json.dumps(secret)
     secretsmanager_client_test.create_secret(
         Name="totesys-warehouse", SecretString=json_secret
