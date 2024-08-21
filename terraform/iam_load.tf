@@ -29,10 +29,34 @@ resource "aws_iam_role_policy_attachment" "cw_policy_attachment_load" {
     policy_arn = aws_iam_policy.cw_policy.arn
 }
 
+// Set up terraform IAMS permissions for Lambda - S3
+data "aws_iam_policy_document" "s3_document_load"{
+    statement {
+
+        effect = "Allow"
+        actions = ["s3:GetObject",
+                   "s3:ListBucket"]
+
+       resources = [
+            "${aws_s3_bucket.processed_data_bucket.arn}/*",
+            "${aws_s3_bucket.processed_data_bucket.arn}"
+        ]       
+    }
+
+}
+
+//Create the IAM policy using the s3 policy document
+resource "aws_iam_policy" "s3_policy_load" {
+    name_prefix = "s3-policy-${var.load_lambda}"
+    description = "load lambda policy for S3 read access "
+    policy = data.aws_iam_policy_document.s3_document_load.json
+}
+
+
 # Attach the existing s3 policy to the transform lambda role
 resource "aws_iam_role_policy_attachment" "s3_policy_attachment_load" {
     role = aws_iam_role.load_lambda_role.name
-    policy_arn = aws_iam_policy.s3_policy_extract_load.arn
+    policy_arn = aws_iam_policy.s3_policy_load.arn
   
 }
 
@@ -56,7 +80,7 @@ resource "aws_iam_policy" "secret_manager_policy_warehouse" {
 }
 
 # Attach the Policy to the Lambda Role
-resource "aws_iam_role_policy_attachment" "secret_manager_policy_attachement" {
+resource "aws_iam_role_policy_attachment" "secret_manager_load_policy_attachement" {
     role = aws_iam_role.extract_lambda_role.name
     policy_arn = aws_iam_policy.secret_manager_policy_warehouse.arn
   

@@ -48,7 +48,7 @@ resource "aws_iam_role_policy_attachment" "cw_policy_attachment_extract" {
 
 //Set up terraform IAMS permissions for Lambda - S3
 //The IAM Policy Document specifies the permissions required for Lambda to access s3
-data "aws_iam_policy_document" "s3_document_extract_load"{
+data "aws_iam_policy_document" "s3_document_extract"{
     statement {
 
         effect = "Allow"
@@ -65,22 +65,22 @@ data "aws_iam_policy_document" "s3_document_extract_load"{
 }
 
 //Create the IAM policy using the s3 policy document
-resource "aws_iam_policy" "s3_policy_extract_load" {
+resource "aws_iam_policy" "s3_policy_extract" {
     name_prefix = "s3-policy-${var.extract_lambda}"
-    description = "transform lambda policy for S3 read access "
-    policy = data.aws_iam_policy_document.s3_document_extract_load.json
+    description = "extract lambda policy for S3 read/write access "
+    policy = data.aws_iam_policy_document.s3_document_extract.json
 }
 
 # Attach the Policy to the Role
 resource "aws_iam_role_policy_attachment" "s3_policy_attachment_extract" {
     role = aws_iam_role.extract_lambda_role.name
-    policy_arn = aws_iam_policy.s3_policy_extract_load.arn
+    policy_arn = aws_iam_policy.s3_policy_extract.arn
   
 }
 
 //Set up terraform IAMS for Lambda - Secrets manager
 //The IAM Policy Document specifies the permissions required for extract Lambda to access AWS secrets manager
-data "aws_iam_policy_document" "secret_manager_document"{
+data "aws_iam_policy_document" "secret_manager_extract_document"{
     statement  {
       actions = [
         "secretsmanager:GetSecretValue"
@@ -98,7 +98,7 @@ resource "aws_iam_policy" "secret_manager_policy" {
 }
 
 # Attach the Policy to the Lambda Role
-resource "aws_iam_role_policy_attachment" "secret_manager_policy_attachement" {
+resource "aws_iam_role_policy_attachment" "secret_manager_extract_policy_attachement" {
     role = aws_iam_role.extract_lambda_role.name
     policy_arn = aws_iam_policy.secret_manager_policy.arn
   
