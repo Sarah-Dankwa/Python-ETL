@@ -1,4 +1,6 @@
-from src.transform import dim_date, read_parquet_from_s3, write_parquet_to_s3_bucket, fact_sales_order, dim_design
+from src.transform import (dim_date, read_parquet_from_s3, write_parquet_to_s3_bucket, 
+fact_sales_order, dim_design, dim_currency, get_all_files, dim_staff, dim_counterparty,
+ dim_location, lambda_handler)
 import pytest
 from datetime import datetime
 from unittest.mock import patch, call, Mock
@@ -7,6 +9,8 @@ import json
 import pyarrow.parquet as pq
 import pandas as pd
 import boto3
+from moto import mock_aws
+import os
 
 
 
@@ -17,6 +21,37 @@ def patch_datetime_now():
     with patch("datetime.datetime") as mock_datetime:
         mock_datetime.now.return_value.isoformat.return_value = FAKE_TIME_STR
         yield mock_datetime
+
+
+@pytest.fixture(scope="function")
+def aws_credentials():
+    """Mocked AWS Credentials for moto."""
+    os.environ["AWS_ACCESS_KEY_ID"] = "testing"
+    os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
+    os.environ["AWS_SECURITY_TOKEN"] = "testing"
+    os.environ["AWS_SESSION_TOKEN"] = "testing"
+    os.environ["AWS_DEFAULT_REGION"] = "eu-west-2"
+
+@pytest.fixture(scope="function")
+def s3(aws_credentials):
+    """
+    Return a mocked S3 client
+    """
+    with mock_aws():
+        yield boto3.client("s3", region_name="eu-west-2")
+
+@pytest.fixture(scope="function")
+def mocked_aws(aws_credentials):
+    """
+    Mock all AWS interactions
+    Requires you to create your own boto3 clients
+    """
+    with mock_aws():
+        yield
+
+@pytest.fixture
+def create_bucket1(s3):
+    s3.create_bucket(Bucket="test_bucket")
 
 
 class TestDimentionDate:
@@ -151,3 +186,187 @@ class TestRemodellingdesign():
         with caplog.at_level(logging.ERROR):
             design_df = dim_design(df1)
             assert "failed to create dim_design dataframe" in caplog.text 
+
+
+@patch("src.transform.INGEST_BUCKET_NAME", "nc-alapin-extract-test-bucket")
+class TestRemodellingcurrency():
+    @pytest.mark.it("Testing remodelling currency dimension table")
+    def test_remodelling_dim_currency_table(self):
+        keys = ['currency/2024/08/19/23:17:17/currency.parquet']
+        df = read_parquet_from_s3(keys)
+        currency_df = dim_currency(df)
+        assert ["currency_id", "currency_code", "currency_name"] == list(currency_df.columns) 
+        assert currency_df["currency_name"][0] == "British pound"
+        assert currency_df["currency_name"][1] == "United States dollar"
+        assert currency_df["currency_name"][2] == "European Euro"
+
+    @pytest.mark.it("Testing remodelling currency dimension table handles error")
+    def test_remodelling_dim_currency_table_error_handling(self, caplog):
+        df1 = pd.DataFrame()
+        
+        with caplog.at_level(logging.ERROR):
+            currency_df = dim_currency(df1)
+            assert "failed to create dim_currency dataframe" in caplog.text 
+
+
+@patch("src.transform.INGEST_BUCKET_NAME", "nc-alapin-extract-test-bucket")
+class TestGetAllFiles():
+    @pytest.mark.it("Testing Get All Files function from S3 table prefix")
+    def test_get_all_files(self):
+        prefix_1 = "sales_order"
+        list_files_1 = get_all_files(prefix_1)
+        prefix_2 = "department"
+        list_files_2 = get_all_files(prefix_2)
+        assert ['sales_order/2024/08/19/23:17:17/sales_order.parquet',
+                'sales_order/2024/08/20/23:17:18/23:17:17/sales_order.parquet'] == list_files_1
+        assert ['department/2024/08/19/23:17:17/department.parquet'] == list_files_2
+        
+
+    @pytest.mark.it("Testing get all files handles error")
+    def test_get_all_files_error_handling(self, caplog):
+       
+        with caplog.at_level(logging.ERROR):
+            prefix_2 = "dpartment"
+            list_files_2 = get_all_files(prefix_2)
+            assert "failed to load files" in caplog.text 
+
+
+@patch("src.transform.INGEST_BUCKET_NAME", "nc-alapin-extract-test-bucket")
+class TestRemodellingStaff():
+    @pytest.mark.it("Testing remodelling staff dimension table")
+    def test_remodelling_dim_staff_table(self):
+        keys = ['staff/2024/08/19/23:17:17/staff.parquet']
+        df = read_parquet_from_s3(keys)
+        staff_df = dim_staff(df)
+        assert ["staff_id", "first_name", "last_name", "department_name", 
+                                 "location","email_address"] == list(staff_df.columns)
+        assert staff_df.shape == (20,6) 
+        assert staff_df["first_name"][0] == "Jeremie"
+        assert staff_df["location"][0] == "Manchester"
+        assert staff_df["department_name"][0] == "Purchasing"
+
+    @pytest.mark.it("Testing dim_staff handles error")
+    def test_dim_staff_error_handling(self, caplog):
+       
+        with caplog.at_level(logging.ERROR):
+            df1 = pd.DataFrame()
+            staff_df = dim_staff(df1)
+            assert "failed to create dim_staff dataframe" in caplog.text 
+
+@patch("src.transform.INGEST_BUCKET_NAME", "nc-alapin-extract-test-bucket")
+class TestRemodellingCounterparty():
+    @pytest.mark.it("Testing remodelling counterparty dimension table")
+    def test_remodelling_dim_counterparty_table(self):
+        keys = ['counterparty/2024/08/19/23:17:17/counterparty.parquet']
+        df = read_parquet_from_s3(keys)
+        counterparty_df = dim_counterparty(df)
+        assert ["counterparty_id", "counterparty_legal_name", "counterparty_legal_address_line_1", 
+                "counterparty_legal_address_line_2", "counterparty_legal_district", "counterparty_legal_city",
+                  "counterparty_legal_postal_code", "counterparty_legal_country", 
+                  "counterparty_legal_phone_number"] == list(counterparty_df.columns) 
+        assert counterparty_df.shape == (20,9)
+        assert counterparty_df["counterparty_legal_name"][0] == "Fahey and Sons" 
+        assert counterparty_df["counterparty_legal_address_line_1"][0] == "605 Haskell Trafficway" 
+        assert counterparty_df["counterparty_legal_address_line_2"][0] == "Axel Freeway" 
+        assert counterparty_df["counterparty_legal_district"][0] == None 
+        assert counterparty_df["counterparty_legal_city"][0] == "East Bobbie" 
+        assert counterparty_df["counterparty_legal_postal_code"][0] == "88253-4257" 
+        assert counterparty_df["counterparty_legal_country"][0] == "Heard Island and McDonald Islands" 
+        assert counterparty_df["counterparty_legal_phone_number"][0] == "9687 937447" 
+
+    @pytest.mark.it("Testing dim_counterparty handles error")
+    def test_dim_counterparty_error_handling(self, caplog):
+       
+        with caplog.at_level(logging.ERROR):
+            df1 = pd.DataFrame()
+            staff_df = dim_counterparty(df1)
+            assert "failed to create dim_counterparty dataframe" in caplog.text 
+
+
+@patch("src.transform.INGEST_BUCKET_NAME", "nc-alapin-extract-test-bucket")
+class TestRemodellingLocation():
+    @pytest.mark.it("Testing remodelling Location dimension table")
+    def test_remodelling_dim_location_table(self):
+        keys = ['address/2024/08/19/23:17:17/address.parquet']
+        df = read_parquet_from_s3(keys)
+        location_df = dim_location(df)
+        assert ["location_id", "address_line_1", "address_line_2", "district", 
+                                    "city", "postal_code", "country", "phone"]== list(location_df.columns) 
+        assert location_df.shape == (30,8)
+        assert location_df["location_id"][0] == 1 
+        assert location_df["address_line_1"][0] == "6826 Herzog Via" 
+        assert location_df["address_line_2"][0] == None 
+        assert location_df["district"][0] == "Avon" 
+        assert location_df["city"][0] == "New Patienceburgh" 
+        assert location_df["postal_code"][0] == "28441" 
+        assert location_df["country"][0] == "Turkey" 
+        assert location_df["phone"][0] == "1803 637401"
+
+    @pytest.mark.it("Testing dim_location handles error")
+    def test_dim_location_error_handling(self, caplog):
+       
+        with caplog.at_level(logging.ERROR):
+            df1 = pd.DataFrame()
+            location_df = dim_location(df1)
+            assert "failed to create dim_location dataframe" in caplog.text 
+
+
+@patch("src.transform.INGEST_BUCKET_NAME", "nc-alapin-extract-test-bucket")
+class TestLambdaHandler():
+    @pytest.mark.skip("Testing Lambda Handler table")
+    @patch("src.transform.year", "2024")
+    @patch("src.transform.month", "08")
+    @patch("src.transform.day", "21")
+    @patch("src.transform.time", "01:01:01")
+    def test_lambda_handler_full_load(self, create_bucket1):        
+        file_path_list = lambda_handler()
+        assert file_path_list == ['fact_sales_order/2024/08/21/01:01:01/fact_sales_order.parquet', 
+                'dim_location/2024/08/21/01:01:01/dim_location.parquet',
+                'dim_counterparty/2024/08/21/01:01:01/dim_counterparty.parquet',
+                'dim_staff/2024/08/21/01:01:01/dim_staff.parquet',
+                'dim_currency/2024/08/21/01:01:01/dim_currency.parquet',
+                'dim_design/2024/08/21/01:01:01/dim_design.parquet',
+                'dim_date/2024/08/21/01:01:01/dim_date.parquet']
+
+
+
+    @pytest.mark.it("Testing Lambda handler to write event/key files to S3 bucket")
+    @patch("src.transform.TRANSFORM_BUCKET_NAME", "nc-alapin-transfrom-test-bucket")
+    @patch("src.transform.year", "2024")
+    @patch("src.transform.month", "08")
+    @patch("src.transform.day", "21")
+    @patch("src.transform.time", "01:01:01")
+    def test_writing_files_to_s3(self):
+        keys = ['sales_order/2024/08/20/23:17:18/23:17:17/sales_order.parquet', 
+                'staff/2024/08/19/23:17:17/staff.parquet',
+                'department/2024/08/19/23:17:17/department.parquet', 
+                'counterparty/2024/08/19/23:17:17/counterparty.parquet']
+        file_list = lambda_handler(event=keys)       
+        assert file_list == ['fact_sales_order/2024/08/21/01:01:01/fact_sales_order.parquet', 
+                'dim_staff/2024/08/21/01:01:01/dim_staff.parquet',
+                'dim_counterparty/2024/08/21/01:01:01/dim_counterparty.parquet']
+        
+
+    @pytest.mark.it("Testing Lambda handler to write empty event file list to S3 bucket")
+    @patch("src.transform.TRANSFORM_BUCKET_NAME", "nc-alapin-transfrom-test-bucket")
+    def test_writing_empty_list_to_s3(self, caplog):
+        keys = []
+        
+        with caplog.at_level(logging.INFO):
+            file_list = lambda_handler(event=keys)       
+            assert file_list == []
+            assert "No new files to transfrom" in caplog.text
+            
+
+    @pytest.mark.it("Testing Lambda handler for error handling with wrong S3 bucket")
+    @patch("src.transform.TRANSFORM_BUCKET_NAME", "")
+    def test_error_handling_invalid_bucket(self, caplog):
+        keys = ['sales_order/2024/08/20/23:17:18/23:17:17/sales_order.parquet', 
+                'staff/2024/08/19/23:17:17/staff.parquet',
+                'department/2024/08/19/23:17:17/department.parquet']
+        with caplog.at_level(logging.ERROR):
+            file_list = lambda_handler(event=keys)       
+            assert "Transform lambda failed to complete" in caplog.text
+    
+
+    
