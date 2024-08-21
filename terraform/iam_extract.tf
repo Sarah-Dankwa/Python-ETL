@@ -181,8 +181,6 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_sns_policy_attachment" {
   policy_arn = aws_iam_policy.cloudwatch_sns_policy.arn
 }
 
-
-
 //Set up terraform IAMS permissions for Lambda - RDS - Needs a discussion on if we really need it or not
 /*data "aws_iam_policy_document" "rds_document"{
     statement {data "aws_iam_policy_document" "s3_document"{
