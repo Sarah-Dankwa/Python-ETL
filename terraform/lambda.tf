@@ -32,7 +32,7 @@ resource "aws_lambda_function" "workflow_tasks_extract" {
   source_code_hash = data.archive_file.extract_lambda.output_base64sha256
 
   #Specifies the IAM role that the extract Lambda function will assume when it runs, where there is attached permissions of using other resources
-  role             = aws_iam_role.lambda_role.arn 
+  role             = aws_iam_role.extract_lambda_role.arn
 
   # Define the entry point of the Lambda function 'extract', which is 'lambda_handler()' inside 'extract.py' 
   handler          = "${var.extract_lambda}.lambda_handler"  
@@ -118,7 +118,7 @@ resource "aws_lambda_function" "workflow_tasks_transform" {
 resource "aws_lambda_function" "workflow_tasks_load" {
   function_name    = var.load_lambda
   source_code_hash = data.archive_file.load_lambda.output_sha256
-  role             = aws_iam_role.lambda_role.arn
+  role             = aws_iam_role.load_lambda_role.arn
   handler          = "${var.load_lambda}.lambda_handler"
   runtime          = "python3.12"
   timeout          = 120

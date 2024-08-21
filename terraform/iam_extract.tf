@@ -94,7 +94,7 @@ data "aws_iam_policy_document" "secret_manager_extract_document"{
 //Create the IAM policy using the secret manager policy document
 resource "aws_iam_policy" "secret_manager_policy" {
     name_prefix = "secretmanager-policy-${var.extract_lambda}"
-    policy = data.aws_iam_policy_document.secret_manager_document.json
+    policy = data.aws_iam_policy_document.secret_manager_extract_document.json
 }
 
 # Attach the Policy to the Lambda Role
