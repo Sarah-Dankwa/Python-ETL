@@ -43,11 +43,11 @@ def db_connection() -> Connection:
     try:
         secret = get_warehouse_credentials()
         return Connection(
-            user=secret["Username"],
-            database=secret["Database"],
-            password=secret["Password"],
-            host=secret["Hostname"],
-            port=secret["Port"],
+            user=secret["POSTGRES_USERNAME"],
+            database=secret["POSTGRES_DATABASE"],
+            password=secret["POSTGRES_PASSWORD"],
+            host=secret["POSTGRES_HOSTNAME"],
+            port=secret["POSTGRES_PORT"]
         )
     except InterfaceError:
         logger.error("NO CONNECTION TO DATABASE - PLEASE CHECK")
@@ -131,6 +131,6 @@ def lambda_handler(event: list, context):
 
     for key in event:
         df = get_latest_data_for_one_table(key)
-        if df:
+        if df is not None:
             table_name = key.split('/')[0]
             # insert_new_data_into_data_warehouse(df, table_name)
