@@ -162,8 +162,6 @@ class TestInsertNewDataIntoWarehouse:
         df = get_latest_data_for_one_table(key)
         insert_new_data_into_data_warehouse(df, 'fact_sales_order')
         response = conn.run('SELECT * FROM fact_sales_order LIMIT 5')
-        print(response)
-        assert False
 
 
 class TestLambdaHandler:
