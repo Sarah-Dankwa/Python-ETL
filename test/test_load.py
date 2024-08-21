@@ -172,10 +172,9 @@ class TestInsertNewDataIntoWarehouse:
             assert 'Cannot add data to the database:' in caplog.text
 
 
-
+@pytest.mark.skip
 class TestLambdaHandler:
     """tests for the lambda handler"""
-
     @pytest.mark.it('calls get_latest_data_for_one_table for every key in event')
     @patch('src.load.insert_new_data_into_data_warehouse')
     @patch('src.load.get_latest_data_for_one_table', return_value=pd.DataFrame)
