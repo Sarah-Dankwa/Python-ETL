@@ -39,15 +39,15 @@ data "aws_iam_policy_document" "stepfunctions_lambda_policy_document" {
 }
 
 //Create the IAM policy using the Step functions - Lambda policy document
-resource "aws_iam_policy" "stepfunction_lambda_policy" {
-  name        = "step_function_lambda_policy"
+resource "aws_iam_policy" "step_function_lambda_policy" {
+  name_prefix = "step_function-policy-${var.extract_lambda}-${var.transform_lambda}-${var.load_lambda}"
   policy = data.aws_iam_policy_document.stepfunctions_lambda_policy_document.json
 }
 
 # Attach the Policy to the step functions state machine assuming role
-resource "aws_iam_role_policy_attachment" "stepfunction_lambda_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "step_function_lambda_policy_attachment" {
   role       = aws_iam_role.state_machine_role.name
-  policy_arn = aws_iam_policy.stepfunction_lambda_policy.arn
+  policy_arn = aws_iam_policy.step_function_lambda_policy.arn
 }
 
 // Creating a terraform IAMS role for eventbridge

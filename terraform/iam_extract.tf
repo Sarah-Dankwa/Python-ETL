@@ -23,7 +23,7 @@ resource "aws_iam_role" "extract_lambda_role" {
 
 // Set up terraform IAMS permissions for Lambda - Cloudwatch
 // //The IAM Policy Document specifies the permissions required for extract Lambda to access cloudwatch
-data "aws_iam_policy_document" "cw_document"{
+data "aws_iam_policy_document" "cw_document_extract"{
 
     statement {
       effect = "Allow"
@@ -34,15 +34,15 @@ data "aws_iam_policy_document" "cw_document"{
 }
 
 //Create the IAM policy using the cloud watch policy document
-resource "aws_iam_policy" "cw_policy" {
+resource "aws_iam_policy" "cw_policy_extract" {
     name_prefix = "cw-policy-${var.extract_lambda}"
-    policy = data.aws_iam_policy_document.cw_document.json
+    policy = data.aws_iam_policy_document.cw_document_extract.json
 }
 
 # Attach the CW Policy to the Extract Role
 resource "aws_iam_role_policy_attachment" "cw_policy_attachment_extract" {
     role = aws_iam_role.extract_lambda_role.name
-    policy_arn = aws_iam_policy.cw_policy.arn
+    policy_arn = aws_iam_policy.cw_policy_extract.arn
   
 }
 
@@ -123,7 +123,7 @@ resource "aws_iam_policy" "ssm_policy" {
 }
 
 # Attach the SSM Policy to the lambda Role
-resource "aws_iam_role_policy_attachment" "ssm_policy_attachement" {
+resource "aws_iam_role_policy_attachment" "ssm_policy_attachment" {
     role = aws_iam_role.extract_lambda_role.name
     policy_arn = aws_iam_policy.ssm_policy.arn
   
