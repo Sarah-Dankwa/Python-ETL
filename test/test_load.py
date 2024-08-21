@@ -2,7 +2,7 @@ import pytest
 from dotenv import load_dotenv
 from unittest.mock import patch
 from pg8000.native import Connection
-from db.seed import seed
+from db.seed import seed_warehouse
 import json
 import boto3
 from moto import mock_aws
@@ -60,10 +60,16 @@ def set_environment_variables():
     load_dotenv()
 
 
-@pytest.fixture()
-def run_seed():
-    """Runs seed before starting tests"""
-    seed()
+@pytest.fixture
+def conn():
+    db = None
+    try:
+        db = connect_to_db()
+        seed_warehouse(db)
+        yield db
+    finally:
+        if db:
+            db.close()
 
 
 class TestGetWarehouseCredentials:
