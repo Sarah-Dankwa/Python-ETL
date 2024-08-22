@@ -21,6 +21,8 @@ import pandas as pd
 import boto3
 #from moto import mock_aws
 import os
+from dotenv import load_dotenv
+
 
 
 FAKE_TIME_STR = "2024-08-20T02:02:02"
@@ -116,6 +118,7 @@ class TestDimentionDate:
 class TestReadParquteFromS3:
     @pytest.mark.it("Testing read_parquet_from_s3 reading file from S3 bucket")
     def test_reading_single_file_from_s3(self):
+        load_dotenv()
         keys = ["sales_order/2024/08/19/23:17:17/sales_order.parquet"]
         df = read_parquet_from_s3(keys)
         assert df.shape == (9798, 12)
