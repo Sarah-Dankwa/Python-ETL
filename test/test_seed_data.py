@@ -61,7 +61,7 @@ dim_counterparty_cols = [
     'counterparty_id',
     'counterparty_legal_name',
     'counterparty_legal_address_line_1',
-    'counterparty_legal_address_line2',
+    'counterparty_legal_address_line_2',
     'counterparty_legal_district',
     'counterparty_legal_city',
     'counterparty_legal_postal_code',
@@ -69,7 +69,7 @@ dim_counterparty_cols = [
     'counterparty_legal_phone_number'
 ]
 
-testdata = [
+warehouse_testdata = [
     ('fact_sales_order', fact_sales_order_cols),
     ('dim_staff', dim_staff_cols),
     ('dim_location', dim_location_cols),
@@ -78,3 +78,5 @@ testdata = [
     ('dim_currency', dim_currency_cols),
     ('dim_counterparty', dim_counterparty_cols)
 ]
+
+oltp_testdata = []
