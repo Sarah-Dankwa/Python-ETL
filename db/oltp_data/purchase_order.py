@@ -494,7 +494,7 @@ purchase_order = [
         'created_at': '2022-11-22 17:02:10.130000',
         'last_updated': '2022-11-22 17:02:10.130000',
         'staff_id': 4,
-        'counterparty_id': 0,
+        'counterparty_id': 10,
         'item_code': '125IBOG',
         'item_quantity': 288,
         'item_unit_price': 894.07,

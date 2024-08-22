@@ -58,7 +58,6 @@ class TestOLTPSeed:
         for table in expected:
             assert [table] in result
 
-
     @pytest.mark.it('test OLTP tables have expected columns')
     @pytest.mark.parametrize("table_name,expected", oltp_testdata)
     def test_expected_columns_in_oltp_database(self, oltp_conn, col_names_query, table_name, expected):

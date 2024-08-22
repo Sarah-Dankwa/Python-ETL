@@ -1,13 +1,18 @@
 from pg8000.native import identifier, Connection
 from db.create_queries import get_warehouse_queries, get_oltp_queries
+from db.insert_queries import get_all_insert_queries
 
-def seed(db: Connection, queries: list):
+def seed(db: Connection, queries: list, insert_queries:list = None):
     tables = get_warehouse_tables()
     tables += get_oltp_tables()
 
     teardown(db, tables)
     for query in queries:
         db.run(query)
+    
+    if insert_queries:
+        for query in insert_queries:
+            db.run(query)
 
 
 def teardown(db: Connection, tables: list):
@@ -27,7 +32,8 @@ def seed_warehouse(db: Connection):
 
 def seed_oltp(db: Connection):
     queries = get_oltp_queries()
-    seed(db, queries)
+    insert_queries = get_all_insert_queries()
+    seed(db, queries, insert_queries)
 
 
 def get_oltp_tables():

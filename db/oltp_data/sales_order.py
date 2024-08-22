@@ -1,5 +1,19 @@
 sales_order = [
     {
+        'sales_order_id': 1,
+        'created_at': '2022-11-03 14:20:52.186000',
+        'last_updated': '2022-11-03 14:20:52.186000',
+        'design_id': 4,
+        'staff_id': 7,
+        'counterparty_id': 8,
+        'units_sold': 203,
+        'unit_price': 4.55,
+        'currency_id': 2,
+        'agreed_delivery_date': '2022-11-07',
+        'agreed_payment_date': '2022-11-08',
+        'agreed_delivery_location_id': 9
+    },
+    {
         'sales_order_id': 2,
         'created_at': '2022-11-03 14:20:52.186000',
         'last_updated': '2022-11-03 14:20:52.186000',
@@ -312,7 +326,7 @@ sales_order = [
         'created_at': '2022-11-22 11:21:10.343000',
         'last_updated': '2022-11-22 11:21:10.343000',
         'design_id': 4,
-        'staff_id': 13,
+        'staff_id': 3,
         'counterparty_id': 10,
         'units_sold': 69611,
         'unit_price': 3.08,

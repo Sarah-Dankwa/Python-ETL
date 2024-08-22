@@ -144,14 +144,6 @@ transaction = [
         'last_updated': '2022-11-07 09:07:10.485000'
     },
     {
-        'transaction_id': 19,
-        'transaction_type': 'PURCHASE',
-        'sales_order_id': None,
-        'purchase_order_id': 9,
-        'created_at': '2022-11-07 11:16:10.249000',
-        'last_updated': '2022-11-07 11:16:10.249000'
-    },
-    {
         'transaction_id': 20,
         'transaction_type': 'SALE',
         'sales_order_id': 11,
@@ -174,14 +166,6 @@ transaction = [
         'purchase_order_id': 11,
         'created_at': '2022-11-07 17:36:09.898000',
         'last_updated': '2022-11-07 17:36:09.898000'
-    },
-    {
-        'transaction_id': 23,
-        'transaction_type': 'PURCHASE',
-        'sales_order_id': None,
-        'purchase_order_id': 12,
-        'created_at': '2022-11-08 14:07:10.394000',
-        'last_updated': '2022-11-08 14:07:10.394000'
     },
     {
         'transaction_id': 24,
@@ -320,14 +304,6 @@ transaction = [
         'last_updated': '2022-11-14 18:25:10.356000'
     },
     {
-        'transaction_id': 41,
-        'transaction_type': 'PURCHASE',
-        'sales_order_id': None,
-        'purchase_order_id': 25,
-        'created_at': '2022-11-15 08:12:10.373000',
-        'last_updated': '2022-11-15 08:12:10.373000'
-    },
-    {
         'transaction_id': 42,
         'transaction_type': 'SALE',
         'sales_order_id': 17,
@@ -376,27 +352,11 @@ transaction = [
         'last_updated': '2022-11-16 09:05:10.336000'
     },
     {
-        'transaction_id': 48,
-        'transaction_type': 'SALE',
-        'sales_order_id': 20,
-        'purchase_order_id': None,
-        'created_at': '2022-11-17 09:52:10.749000',
-        'last_updated': '2022-11-17 09:52:10.749000'
-    },
-    {
         'transaction_id': 49,
         'transaction_type': 'SALE',
         'sales_order_id': 21,
         'purchase_order_id': None,
         'created_at': '2022-11-17 11:47:09.942000',
         'last_updated': '2022-11-17 11:47:09.942000'
-    },
-    {
-        'transaction_id': 50,
-        'transaction_type': 'PURCHASE',
-        'sales_order_id': None,
-        'purchase_order_id': 29,
-        'created_at': '2022-11-17 13:01:10.403000',
-        'last_updated': '2022-11-17 13:01:10.403000'
     }
 ]
