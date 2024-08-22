@@ -6,6 +6,13 @@ def seed_warehouse(db: Connection):
     Args: 
         db - database connection
     """
+
+    teardown_warehouse(db)
+    queries = get_queries()
+    for query in queries:
+        db.run(query)
+
+def teardown_warehouse(db: Connection):
     tables = [
         'dim_date',
         'dim_staff',
@@ -18,11 +25,6 @@ def seed_warehouse(db: Connection):
 
     for table in tables:
         db.run(f'DROP TABLE IF EXISTS {identifier(table)};')
-    
-    queries = get_queries()
-    for query in queries:
-        db.run(query)
-
 
 def get_queries():
     '''queries to create expected tables in mock data warehouse'''
