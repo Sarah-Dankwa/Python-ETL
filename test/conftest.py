@@ -93,13 +93,25 @@ def transform_s3_client(aws_credentials):
             CreateBucketConfiguration={"LocationConstraint": "eu-west-2"},
         )
         client.upload_file('Test_Data/sales_order.parquet', 'test-ingestion-bucket', 'sales_order/2024/08/19/23:17:17/sales_order.parquet')
+        client.upload_file('Test_Data/design.parquet', 'test-ingestion-bucket', 'design/2024/08/19/23:17:17/design.parquet')
+        client.upload_file('Test_Data/currency.parquet', 'test-ingestion-bucket', 'currency/2024/08/19/23:17:17/currency.parquet')
+        client.upload_file('Test_Data/department.parquet', 'test-ingestion-bucket', 'department/2024/08/19/23:17:17/department.parquet')
+        client.upload_file('Test_Data/staff.parquet', 'test-ingestion-bucket', 'staff/2024/08/19/23:17:17/staff.parquet')
+        client.upload_file('Test_Data/counterparty.parquet', 'test-ingestion-bucket', 'counterparty/2024/08/19/23:17:17/counterparty.parquet')
+        client.upload_file('Test_Data/address.parquet', 'test-ingestion-bucket', 'address/2024/08/19/23:17:17/address.parquet')
         client.upload_file('Test_Data/sales_order2.parquet', 'test-ingestion-bucket', "sales_order/2024/08/20/23:17:18/23:17:17/sales_order.parquet")
         client.create_bucket(
             Bucket="test-transformation-bucket",
             CreateBucketConfiguration={"LocationConstraint": "eu-west-2"},
         )
         client.upload_file('Test_Data/sales_order.parquet', 'test-transformation-bucket', 'sales_order/2024/08/20/05:05:05/sales_order.parquet')
-        
+        client.upload_file('Test_Data/sales_order.parquet', 'test-transformation-bucket', 'fact_sales_order/2024/08/21/01:01:01/fact_sales_order.parquet')
+        client.upload_file('Test_Data/address.parquet', 'test-transformation-bucket', 'dim_location/2024/08/21/01:01:01/dim_location.parquet')
+        client.upload_file('Test_Data/counterparty.parquet', 'test-transformation-bucket', 'dim_counterparty/2024/08/21/01:01:01/dim_counterparty.parquet')
+        client.upload_file('Test_Data/staff.parquet', 'test-transformation-bucket', 'dim_staff/2024/08/21/01:01:01/dim_staff.parquet')
+        client.upload_file('Test_Data/currency.parquet', 'test-transformation-bucket', 'dim_currency/2024/08/21/01:01:01/dim_currency.parquet')
+        client.upload_file('Test_Data/design.parquet', 'test-transformation-bucket', 'dim_design/2024/08/21/01:01:01/dim_design.parquet')
+        client.upload_file('Test_Data/date.parquet', 'test-transformation-bucket', 'dim_date/2024/08/21/01:01:01/dim_date.parquet')
         yield client
 
 @pytest.fixture

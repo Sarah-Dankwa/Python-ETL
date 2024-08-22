@@ -142,10 +142,10 @@ class TestWriteParquteToS3:
             assert "File failed to upload" in caplog.text
 
 
-@patch("src.transform.INGEST_BUCKET_NAME", "nc-alapin-extract-test-bucket")
+@patch("src.transform.INGEST_BUCKET_NAME", "test-ingestion-bucket")
 class TestRemodellingSalesOrder:
     @pytest.mark.it("Testing remodelling sales order fact table")
-    def test_remodelling_sales_order_fact_table(self):
+    def test_remodelling_sales_order_fact_table(self,transform_s3_client):
         keys = ["sales_order/2024/08/19/23:17:17/sales_order.parquet"]
         df = read_parquet_from_s3(keys)
         fact_sales_order_df = fact_sales_order(df)
@@ -176,10 +176,10 @@ class TestRemodellingSalesOrder:
             assert "failed to create fact_sales_order dataframe" in caplog.text
 
 
-@patch("src.transform.INGEST_BUCKET_NAME", "nc-alapin-extract-test-bucket")
+@patch("src.transform.INGEST_BUCKET_NAME", "test-ingestion-bucket")
 class TestRemodellingdesign:
     @pytest.mark.it("Testing remodelling design dimension table")
-    def test_remodelling_dim_design_table(self):
+    def test_remodelling_dim_design_table(self, transform_s3_client):
         keys = ["design/2024/08/19/23:17:17/design.parquet"]
         df = read_parquet_from_s3(keys)
         design_df = dim_design(df)
@@ -196,10 +196,10 @@ class TestRemodellingdesign:
             assert "failed to create dim_design dataframe" in caplog.text
 
 
-@patch("src.transform.INGEST_BUCKET_NAME", "nc-alapin-extract-test-bucket")
+@patch("src.transform.INGEST_BUCKET_NAME", "test-ingestion-bucket")
 class TestRemodellingcurrency:
     @pytest.mark.it("Testing remodelling currency dimension table")
-    def test_remodelling_dim_currency_table(self):
+    def test_remodelling_dim_currency_table(self, transform_s3_client):
         keys = ["currency/2024/08/19/23:17:17/currency.parquet"]
         df = read_parquet_from_s3(keys)
         currency_df = dim_currency(df)
@@ -219,10 +219,10 @@ class TestRemodellingcurrency:
             assert "failed to create dim_currency dataframe" in caplog.text
 
 
-@patch("src.transform.INGEST_BUCKET_NAME", "nc-alapin-extract-test-bucket")
+@patch("src.transform.INGEST_BUCKET_NAME", "test-ingestion-bucket")
 class TestGetAllFiles:
     @pytest.mark.it("Testing Get All Files function from S3 table prefix")
-    def test_get_all_files(self):
+    def test_get_all_files(self, transform_s3_client):
         prefix_1 = "sales_order"
         list_files_1 = get_all_files(prefix_1)
         prefix_2 = "department"
@@ -242,10 +242,10 @@ class TestGetAllFiles:
             assert "failed to load files" in caplog.text
 
 
-@patch("src.transform.INGEST_BUCKET_NAME", "nc-alapin-extract-test-bucket")
+@patch("src.transform.INGEST_BUCKET_NAME", "test-ingestion-bucket")
 class TestRemodellingStaff:
     @pytest.mark.it("Testing remodelling staff dimension table")
-    def test_remodelling_dim_staff_table(self):
+    def test_remodelling_dim_staff_table(self, transform_s3_client):
         keys = ["staff/2024/08/19/23:17:17/staff.parquet"]
         df = read_parquet_from_s3(keys)
         staff_df = dim_staff(df)
@@ -271,10 +271,10 @@ class TestRemodellingStaff:
             assert "failed to create dim_staff dataframe" in caplog.text
 
 
-@patch("src.transform.INGEST_BUCKET_NAME", "nc-alapin-extract-test-bucket")
+@patch("src.transform.INGEST_BUCKET_NAME", "test-ingestion-bucket")
 class TestRemodellingCounterparty:
     @pytest.mark.it("Testing remodelling counterparty dimension table")
-    def test_remodelling_dim_counterparty_table(self):
+    def test_remodelling_dim_counterparty_table(self, transform_s3_client):
         keys = ["counterparty/2024/08/19/23:17:17/counterparty.parquet"]
         df = read_parquet_from_s3(keys)
         counterparty_df = dim_counterparty(df)
@@ -314,10 +314,10 @@ class TestRemodellingCounterparty:
             assert "failed to create dim_counterparty dataframe" in caplog.text
 
 
-@patch("src.transform.INGEST_BUCKET_NAME", "nc-alapin-extract-test-bucket")
+@patch("src.transform.INGEST_BUCKET_NAME", "test-ingestion-bucket")
 class TestRemodellingLocation:
     @pytest.mark.it("Testing remodelling Location dimension table")
-    def test_remodelling_dim_location_table(self):
+    def test_remodelling_dim_location_table(self, transform_s3_client):
         keys = ["address/2024/08/19/23:17:17/address.parquet"]
         df = read_parquet_from_s3(keys)
         location_df = dim_location(df)
@@ -350,19 +350,19 @@ class TestRemodellingLocation:
             assert "failed to create dim_location dataframe" in caplog.text
 
 
-@patch("src.transform.INGEST_BUCKET_NAME", "nc-alapin-extract-test-bucket")
+@patch("src.transform.INGEST_BUCKET_NAME", "test-ingestion-bucket")
 class TestLambdaHandler:    
     
     @pytest.mark.it("Testing Lambda Handler table")
-    @patch("src.transform.TRANSFORM_BUCKET_NAME", "nc-alapin-transfrom-test-bucket")
+    @patch("src.transform.TRANSFORM_BUCKET_NAME", "test-transformation-bucket")
     @patch("src.transform.year", "2024")
     @patch("src.transform.month", "08")
     @patch("src.transform.day", "21")
     @patch("src.transform.time", "01:01:01")
-    def test_lambda_handler_full_load(self):
-        s3 = boto3.resource("s3")
-        bucket = s3.Bucket("nc-alapin-transfrom-test-bucket")
-        bucket.objects.all().delete()
+    def test_lambda_handler_full_load(self, transform_s3_client):
+        # s3 = boto3.resource("s3")
+        # bucket = s3.Bucket("nc-alapin-transfrom-test-bucket")
+        # bucket.objects.all().delete()
         file_path_list = lambda_handler()
         assert file_path_list == [
             "fact_sales_order/2024/08/21/01:01:01/fact_sales_order.parquet",
@@ -377,7 +377,7 @@ class TestLambdaHandler:
     
 
     @pytest.mark.it("Testing Lambda handler to write empty event file list to S3 bucket")
-    @patch("src.transform.TRANSFORM_BUCKET_NAME", "nc-alapin-transfrom-test-bucket")
+    @patch("src.transform.TRANSFORM_BUCKET_NAME", "test-transformation-bucket")
     def test_writing_empty_list_to_s3(self, caplog):
         keys = []
 
@@ -392,7 +392,7 @@ class TestLambdaHandler:
     @patch("src.transform.month", "08")
     @patch("src.transform.day", "21")
     @patch("src.transform.time", "01:01:01")
-    def test_writing_files_to_s3(self):
+    def test_writing_files_to_s3(self, transform_s3_client):
         keys = [
             "sales_order/2024/08/20/23:17:18/23:17:17/sales_order.parquet",
             "staff/2024/08/19/23:17:17/staff.parquet",
