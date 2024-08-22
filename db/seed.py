@@ -1,8 +1,11 @@
-from db.connection import connect_to_db
-from pg8000.native import identifier
+from pg8000.native import identifier, Connection
 
-def seed():
-    db = connect_to_db()
+def seed_warehouse(db: Connection):
+    """adds empty tables to the warehouse
+
+    Args: 
+        db - database connection
+    """
     tables = [
         'dim_date',
         'dim_staff',
@@ -19,8 +22,6 @@ def seed():
     queries = get_queries()
     for query in queries:
         db.run(query)
-    
-    db.close()
 
 
 def get_queries():

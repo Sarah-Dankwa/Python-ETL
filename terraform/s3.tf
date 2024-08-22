@@ -10,7 +10,7 @@ resource "aws_s3_bucket" "code_bucket" {
   bucket_prefix = "nc-de-totesys-code-"
 }
 
-#need permission of uploading objects; s3:PutObject
+# The layer that the lambda functions need will be stored in an s3 bucket
 resource "aws_s3_object" "lambda_layer" {
   bucket = aws_s3_bucket.code_bucket.bucket
   key    = "layer/layer.zip"
@@ -22,6 +22,7 @@ resource "aws_s3_object" "lambda_layer" {
   
 }
 
+# The extract, transform and load lambda functions will be stored in an s3 bucket
 resource "aws_s3_object" "lambda_code" {
   for_each = toset([var.extract_lambda, var.transform_lambda, var.load_lambda])
   bucket   = aws_s3_bucket.code_bucket.bucket
