@@ -12,6 +12,95 @@ Run make requirements to install all the python dependencies.
 make requirements
 ```
 
+**GitHub Secrets**
+
+Add following secrets to github secrets
+
+|Secret|Value|
+|------|-----|
+TOTESYS_DATABASE|name of OLTP database
+TOTESYS_HOSTNAME|hostname of OLTP database
+TOTESYS_USERNAME|username for OLTP database
+TOTESYS_PASSWORD|password for OLTP database
+TOTESYS_PORT|5432
+AWS_ACCESS_KEY_ID|aws secret access key OD
+AWS_SECRET_ACCESS_KEY|aws secret access key
+AWS_REGION|aws default region
+
+**Resources to add in the AWS console**
+
+Create secrets in secrets manager with the database credentials for the warehouse and the OLTP database:
+
+**secret name: totesys-database**
+
+Credentials for totesys OLTP database
+
+|Key|Value|
+|---|---|
+|Database|name of totesys database
+|Hostname|hostname of totesys database
+|Username|username of totesys database
+|Password|password of totesys database
+|Port|5432
+
+
+**secret name: totesys-warehouse**
+
+Credentials for totesys data warehouse
+
+|Key|Value|
+|---|---|
+|POSTGRES_DATABASE|name of data warehouse
+|POSTGRES_HOSTNAME|hostname of data warehouse
+|POSTGRES_USERNAME|username of data warehouse
+|POSTGRES_PASSWORD|password of data warehouse
+|POSTGRES_PORT| 5432
+
+
+Update following resources to use the arns of these secrets:
+
+terraform/iam_extract.tf - inside the following data block update the resources field to use arn of the *totesys-database* secret
+```hcl
+data "aws_iam_policy_document" "secret_manager_extract_document"{
+    statement  {
+      actions = [
+        "secretsmanager:GetSecretValue"
+      ]
+      resources = ["arn:aws:secretsmanager:eu-west-2:590183674561:secret:totesys-database-1iOpWx",]
+      effect = "Allow"
+      sid = "AllowSecrets"
+    }
+}
+```
+
+terraform/iam_load.tf - inside the following data block update the resources field to use arn of the *totesys-warehouse* secret
+```hcl
+data "aws_iam_policy_document" "secret_manager_document_warehouse"{
+    statement  {
+      actions = [
+        "secretsmanager:GetSecretValue"
+      ]
+      resources = ["arn:aws:secretsmanager:eu-west-2:590183674561:secret:totesys-warehouse-ltGoRO",]
+      effect = "Allow"
+      sid = "AllowSecrets"
+    }
+}
+```
+
+
+Add S3 bucket for terraform state
+
+Then update terraform/main.tf to use this bucket to store the tf state file
+```hcl
+backend "s3" {
+    bucket = "nc-alapin-project-tf-state"
+    key = "nc-alapin-project-tf-state/terraform.tfstate"
+    region = "eu-west-2"
+  }
+```
+
+**Deploying to AWS**
+
 Export AWS credentials to terminal to ensure terraform deploys to correct account and access to secret manager:
 Credentials will be shared by AWS user with shared account
 
@@ -24,6 +113,27 @@ Then run terraform init
 ```bash
 terraform init
 ```
+
+**Using the test database**
+
+In order to run tests for the extract & load lambdas you will need to create a test postgresql database
+
+Add following variables to a .env file
+```text
+LOCAL_USER=<your psql username>
+LOCAL_PASSWORD=<your psql password>
+LOCAL_DATABASE=test_warehouse
+LOCAL_HOST=localhost
+LOCAL_PORT=5432
+DATA_INGESTED_BUCKET_NAME=test-ingestion-bucket
+DATA_PROCESSED_BUCKET_NAME=test-processed-bucket
+```
+
+then run the following command
+```bash
+make setup-db
+```
+
 
 ## Execution and Usage
 
@@ -61,7 +171,8 @@ Schema of the final Data Warehouse ([Entity Relationship Diagram](https://dbdiag
 **Programming Languages**
 - Python
 - Makefile
-- boto3 library
+- HCL
+- SQL
 
 **Amazon Web Services**
 - Alerts & Metrics
