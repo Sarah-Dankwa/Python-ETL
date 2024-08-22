@@ -109,17 +109,17 @@ class TestReadParquteFromS3:
         assert type(df) == pd.DataFrame
 
 
-@patch("src.transform.INGEST_BUCKET_NAME", "nc-alapin-extract-test-bucket")
+@patch("src.transform.INGEST_BUCKET_NAME", "test-ingestion-bucket")
 class TestWriteParquteToS3:
     @pytest.mark.it(
         "Testing write_parquet_to_s3_bucket writing single parqet file to S3 bucket"
     )
-    @patch("src.transform.TRANSFORM_BUCKET_NAME", "nc-alapin-transfrom-test-bucket")
+    @patch("src.transform.TRANSFORM_BUCKET_NAME", "test-transformation-bucket")
     @patch("src.transform.year", "2024")
     @patch("src.transform.month", "08")
     @patch("src.transform.day", "20")
     @patch("src.transform.time", "05:05:05")
-    def test_writing_single_file_to_s3(self):
+    def test_writing_single_file_to_s3(self, transform_s3_client):
         keys = ["sales_order/2024/08/19/23:17:17/sales_order.parquet"]
         df = read_parquet_from_s3(keys)
         key = write_parquet_to_s3_bucket(df, "sales_order")

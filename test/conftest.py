@@ -98,6 +98,8 @@ def transform_s3_client(aws_credentials):
             Bucket="test-transformation-bucket",
             CreateBucketConfiguration={"LocationConstraint": "eu-west-2"},
         )
+        client.upload_file('Test_Data/sales_order.parquet', 'test-transformation-bucket', 'sales_order/2024/08/20/05:05:05/sales_order.parquet')
+        
         yield client
 
 @pytest.fixture
