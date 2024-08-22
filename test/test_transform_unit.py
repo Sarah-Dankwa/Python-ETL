@@ -19,10 +19,8 @@ import json
 import pyarrow.parquet as pq
 import pandas as pd
 import boto3
-#from moto import mock_aws
+from moto import mock_aws
 import os
-from dotenv import load_dotenv
-
 
 
 FAKE_TIME_STR = "2024-08-20T02:02:02"
@@ -33,40 +31,6 @@ def patch_datetime_now():
     with patch("datetime.datetime") as mock_datetime:
         mock_datetime.now.return_value.isoformat.return_value = FAKE_TIME_STR
         yield mock_datetime
-
-
-# @pytest.fixture(scope="function")
-# def aws_credentials():
-#     """Mocked AWS Credentials for moto."""
-#     os.environ["AWS_ACCESS_KEY_ID"] = "testing"
-#     os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
-#     os.environ["AWS_SECURITY_TOKEN"] = "testing"
-#     os.environ["AWS_SESSION_TOKEN"] = "testing"
-#     os.environ["AWS_DEFAULT_REGION"] = "eu-west-2"
-
-
-# @pytest.fixture(scope="function")
-# def s3(aws_credentials):
-#     """
-#     Return a mocked S3 client
-#     """
-#     with mock_aws():
-#         yield boto3.client("s3", region_name="eu-west-2")
-
-
-# @pytest.fixture(scope="function")
-# def mocked_aws(aws_credentials):
-#     """
-#     Mock all AWS interactions
-#     Requires you to create your own boto3 clients
-#     """
-#     with mock_aws():
-#         yield
-
-
-# @pytest.fixture
-# def create_bucket1(s3):
-#     s3.create_bucket(Bucket="test_bucket")
 
 
 class TestDimentionDate:
@@ -114,11 +78,10 @@ class TestDimentionDate:
         assert len(df.index) == 30
 
 
-@patch("src.transform.INGEST_BUCKET_NAME", "nc-alapin-extract-test-bucket")
+@patch("src.transform.INGEST_BUCKET_NAME", "test-ingestion-bucket")
 class TestReadParquteFromS3:
     @pytest.mark.it("Testing read_parquet_from_s3 reading file from S3 bucket")
-    def test_reading_single_file_from_s3(self):
-        load_dotenv()
+    def test_reading_single_file_from_s3(self, transform_s3_client):
         keys = ["sales_order/2024/08/19/23:17:17/sales_order.parquet"]
         df = read_parquet_from_s3(keys)
         assert df.shape == (9798, 12)
@@ -136,7 +99,7 @@ class TestReadParquteFromS3:
     @pytest.mark.it(
         "Testing read_parquet_from_s3 reading multiple files from S3 bucket"
     )
-    def test_reading_multiple_files_from_s3(self):
+    def test_reading_multiple_files_from_s3(self, transform_s3_client):
         keys = [
             "sales_order/2024/08/19/23:17:17/sales_order.parquet",
             "sales_order/2024/08/20/23:17:18/23:17:17/sales_order.parquet",
