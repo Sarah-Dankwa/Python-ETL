@@ -8,7 +8,7 @@ from unittest.mock import patch
 from datetime import datetime
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def aws_credentials():
     """mock credentials for moto"""
     os.environ["AWS_ACCESS_KEY_ID"] = "testing"
@@ -66,10 +66,7 @@ def secretsmanager_client_test(aws_credentials):
 @pytest.fixture
 def ssm_client(aws_credentials):
     """mock boto3 ssm client"""
-    with mock_aws():
-        yield boto3.client("ssm", region_name="eu-west-2")
-
-
+    with mock_aws():session
 @pytest.fixture
 def s3_client(aws_credentials):
     """mock aws s3 client with a test ingestion and transformation bucket"""
