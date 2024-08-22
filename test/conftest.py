@@ -8,7 +8,7 @@ from unittest.mock import patch
 from datetime import datetime
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def aws_credentials():
     """mock credentials for moto"""
     os.environ["AWS_ACCESS_KEY_ID"] = "testing"
