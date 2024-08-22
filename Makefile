@@ -102,9 +102,8 @@ run-flake8: dev-setup
 
 ## Run the unit tests
 unit-test: setup-db
-	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -vvv \
+	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -vvvrP \
 	--ignore=dependencies/python/ \
-	--no-summary \
 	--testdox)
 
 ## Run all tests including test_recorder.py, test_import.py
