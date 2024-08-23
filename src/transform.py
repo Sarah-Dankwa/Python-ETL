@@ -1,3 +1,4 @@
+
 from botocore.exceptions import ClientError
 import boto3
 import json
@@ -299,15 +300,7 @@ def lambda_handler(event=None, context=None):
         date_objects = client.list_objects_v2(Bucket=TRANSFORM_BUCKET_NAME, Prefix="dim_date")
         bucket_objects = client.list_objects_v2(Bucket=TRANSFORM_BUCKET_NAME)
         if bucket_objects["KeyCount"] == 0:
-            # creation of fact saler_order
-            sales_order_files = get_all_files("sales_order")
-            sales_order_df = read_parquet_from_s3(sales_order_files)
-            file_path_list.append(
-                write_parquet_to_s3_bucket(
-                    fact_sales_order(sales_order_df), "fact_sales_order"
-                )
-            )
-
+            
             # creation of dimension location
             location_files = get_all_files("address")
             location_df = read_parquet_from_s3(location_files)
@@ -347,6 +340,15 @@ def lambda_handler(event=None, context=None):
 
             # creation of dimension date
             file_path_list.append(write_parquet_to_s3_bucket(dim_date(), "dim_date"))
+
+            # creation of fact saler_order
+            sales_order_files = get_all_files("sales_order")
+            sales_order_df = read_parquet_from_s3(sales_order_files)
+            file_path_list.append(
+                write_parquet_to_s3_bucket(
+                    fact_sales_order(sales_order_df), "fact_sales_order"
+                )
+            )
 
             logger.info(f"Fetching all files and transforming all tables completed")
             return file_path_list
@@ -413,3 +415,4 @@ def lambda_handler(event=None, context=None):
             return file_path_list
     except Exception as e:
         logger.error(f"Error{e} Transform lambda failed to complete")
+
