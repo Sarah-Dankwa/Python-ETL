@@ -4,8 +4,10 @@ import boto3
 from moto import mock_aws
 from dotenv import load_dotenv
 import json
+from db.connection import connect_to_db
 from unittest.mock import patch
 from datetime import datetime
+from db.seed import seed_warehouse
 
 
 @pytest.fixture(scope="session")
@@ -38,7 +40,7 @@ def now_variable():
 
 
 @pytest.fixture
-def secretsmanager_client(aws_credentials, environment_variables):
+def secretsmanager_client(aws_credentials, environment_variables, secretsmanager_client_test):
     """mock boto3 secretsmanager client with db credentials from local .env"""
     # load_dotenv()
     secret = {}
@@ -66,7 +68,9 @@ def secretsmanager_client_test(aws_credentials):
 @pytest.fixture
 def ssm_client(aws_credentials):
     """mock boto3 ssm client"""
-    with mock_aws():session
+    with mock_aws():
+        yield boto3.client("ssm", region_name="eu-west-2")
+
 @pytest.fixture
 def s3_client(aws_credentials):
     """mock aws s3 client with a test ingestion and transformation bucket"""
@@ -140,6 +144,7 @@ def transform_s3_client_mock_empty_transform_bucket(aws_credentials):
 
 @pytest.fixture
 def table_names():
+    """table names in the totesys OLTP database"""
     tables = [
         "address",
         "staff",
@@ -155,3 +160,56 @@ def table_names():
     ]
     return tables
 
+@pytest.fixture
+def valid_warehouse_credentials(aws_credentials, environment_variables):
+    """mock boto3 secretsmanager client with warehouse credentials from local
+    .env"""
+
+    secret = {}
+    secret["POSTGRES_DATABASE"] = os.environ["LOCAL_DATABASE"]
+    secret["POSTGRES_HOSTNAME"] = os.environ["LOCAL_HOST"]
+    secret["POSTGRES_USERNAME"] = os.environ["LOCAL_USER"]
+    secret["POSTGRES_PASSWORD"] = os.environ["LOCAL_PASSWORD"]
+    secret["POSTGRES_PORT"] = os.environ["LOCAL_PORT"]
+    json_secret = json.dumps(secret)
+    with mock_aws():
+        client = boto3.client("secretsmanager", region_name="eu-west-2")
+        client.create_secret(Name="totesys-warehouse", SecretString=json_secret)
+        yield client
+
+
+@pytest.fixture
+def invalid_warehouse_credentials(secretsmanager_client_test):
+    """invalid database connections added to mock secrets manager to test
+    error handling
+    """
+
+    secret = {}
+    secret["POSTGRES_DATABASE"] = "invalid_db"
+    secret["POSTGRES_HOSTNAME"] = "invalid_host"
+    secret["POSTGRES_USERNAME"] = "invalid_user"
+    secret["POSTGRES_PASSWORD"] = "invalid_password"
+    secret["POSTGRES_PORT"] = "invalid_port"
+    json_secret = json.dumps(secret)
+    secretsmanager_client_test.create_secret(
+        Name="totesys-warehouse", SecretString=json_secret
+    )
+    yield secretsmanager_client_test
+
+
+@pytest.fixture
+def conn():
+    """connects to local database & adds empty tables
+    
+    yields a connection to the local database 
+    then closes the connection after each test is complete
+    """
+
+    db = None
+    try:
+        db = connect_to_db()
+        seed_warehouse(db)
+        yield db
+    finally:
+        if db:
+            db.close()
