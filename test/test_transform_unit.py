@@ -354,16 +354,25 @@ class TestRemodellingLocation:
 class TestLambdaHandler:    
     
     @pytest.mark.it("Testing Lambda Handler table")
-    @patch("src.transform.TRANSFORM_BUCKET_NAME", "test-transformation-bucket")
+    @patch("src.transform.TRANSFORM_BUCKET_NAME", "test-transformation-bucket-empty")
     @patch("src.transform.year", "2024")
     @patch("src.transform.month", "08")
     @patch("src.transform.day", "21")
     @patch("src.transform.time", "01:01:01")
-    def test_lambda_handler_full_load(self, transform_s3_client):
+    def test_lambda_handler_full_load(self, transform_s3_client_mock_empty_transform_bucket):
         # s3 = boto3.resource("s3")
-        # bucket = s3.Bucket("nc-alapin-transfrom-test-bucket")
+        # bucket = s3.Bucket("test-transformation-bucket")
         # bucket.objects.all().delete()
-        file_path_list = lambda_handler()
+        events = [
+            "sales_order/2024/08/19/23:17:17/sales_order.parquet",
+            "location/2024/08/19/23:17:17/location.parquet",
+            "counterparty/2024/08/19/23:17:17/counterparty.parquet",
+            "staff/2024/08/19/23:17:17/staff.parquet",
+            "currency/2024/08/19/23:17:17/currency.parquet",
+            "design/2024/08/19/23:17:17/design.parquet",
+            "date/2024/08/19/23:17:17/date.parquet",
+        ]
+        file_path_list = lambda_handler(event=events)
         assert file_path_list == [
             "fact_sales_order/2024/08/21/01:01:01/fact_sales_order.parquet",
             "dim_location/2024/08/21/01:01:01/dim_location.parquet",
@@ -378,7 +387,7 @@ class TestLambdaHandler:
 
     @pytest.mark.it("Testing Lambda handler to write empty event file list to S3 bucket")
     @patch("src.transform.TRANSFORM_BUCKET_NAME", "test-transformation-bucket")
-    def test_writing_empty_list_to_s3(self, caplog):
+    def test_writing_empty_list_to_s3(self, caplog, transform_s3_client):
         keys = []
 
         with caplog.at_level(logging.INFO):
@@ -387,7 +396,7 @@ class TestLambdaHandler:
             assert "No new files to transfrom" in caplog.text
 
     @pytest.mark.it("Testing Lambda handler to write event/key files to S3 bucket")
-    @patch("src.transform.TRANSFORM_BUCKET_NAME", "nc-alapin-transfrom-test-bucket")
+    @patch("src.transform.TRANSFORM_BUCKET_NAME", "test-transformation-bucket")
     @patch("src.transform.year", "2024")
     @patch("src.transform.month", "08")
     @patch("src.transform.day", "21")

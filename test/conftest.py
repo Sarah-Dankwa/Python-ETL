@@ -115,6 +115,30 @@ def transform_s3_client(aws_credentials):
         yield client
 
 @pytest.fixture
+def transform_s3_client_mock_empty_transform_bucket(aws_credentials):
+    """mock aws s3 client with an empty test ingestion and transformation bucket"""
+    with mock_aws():
+        client = boto3.client("s3")
+        client.create_bucket(
+            Bucket="test-ingestion-bucket",
+            CreateBucketConfiguration={"LocationConstraint": "eu-west-2"},
+        )
+        client.upload_file('Test_Data/sales_order.parquet', 'test-ingestion-bucket', 'sales_order/2024/08/19/23:17:17/sales_order.parquet')
+        client.upload_file('Test_Data/design.parquet', 'test-ingestion-bucket', 'design/2024/08/19/23:17:17/design.parquet')
+        client.upload_file('Test_Data/currency.parquet', 'test-ingestion-bucket', 'currency/2024/08/19/23:17:17/currency.parquet')
+        client.upload_file('Test_Data/department.parquet', 'test-ingestion-bucket', 'department/2024/08/19/23:17:17/department.parquet')
+        client.upload_file('Test_Data/staff.parquet', 'test-ingestion-bucket', 'staff/2024/08/19/23:17:17/staff.parquet')
+        client.upload_file('Test_Data/counterparty.parquet', 'test-ingestion-bucket', 'counterparty/2024/08/19/23:17:17/counterparty.parquet')
+        client.upload_file('Test_Data/address.parquet', 'test-ingestion-bucket', 'address/2024/08/19/23:17:17/address.parquet')
+        client.upload_file('Test_Data/sales_order2.parquet', 'test-ingestion-bucket', "sales_order/2024/08/20/23:17:18/23:17:17/sales_order.parquet")
+        client.create_bucket(
+            Bucket="test-transformation-bucket-empty",
+            CreateBucketConfiguration={"LocationConstraint": "eu-west-2"},
+        )
+        yield client
+
+
+@pytest.fixture
 def table_names():
     tables = [
         "address",
