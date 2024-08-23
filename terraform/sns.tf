@@ -8,8 +8,8 @@ data "aws_sns_topic" "step_functions_workflow_sns" {
 #   value = data.aws_sns_topic.step_functions_workflow_notifications.arn
 # }
 
-resource "aws_sns_topic_subscription" "step_function_email_subscription"{
-  topic_arn = data.aws_sns_topic.step_functions_workflow_sns.arn
-  protocol  = "email"
-  endpoint  = "hanawang346@gmail.com"
-}
+# resource "aws_sns_topic_subscription" "step_function_email_subscription"{
+#   topic_arn = data.aws_sns_topic.step_functions_workflow_sns.arn
+#   protocol  = "email"
+#   endpoint  = "..."
+# }
