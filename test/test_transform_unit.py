@@ -149,7 +149,6 @@ class TestRemodellingSalesOrder:
         keys = ["sales_order/2024/08/19/23:17:17/sales_order.parquet"]
         df = read_parquet_from_s3(keys)
         fact_sales_order_df = fact_sales_order(df)
-        # assert type(fact_sales_order_df) == pd.DataFrame
         assert [
             "sales_order_id",
             "sales_staff_id",
@@ -360,9 +359,6 @@ class TestLambdaHandler:
     @patch("src.transform.day", "21")
     @patch("src.transform.time", "01:01:01")
     def test_lambda_handler_full_load(self, transform_s3_client_mock_empty_transform_bucket):
-        # s3 = boto3.resource("s3")
-        # bucket = s3.Bucket("test-transformation-bucket")
-        # bucket.objects.all().delete()
         events = [
             "sales_order/2024/08/19/23:17:17/sales_order.parquet",
             "location/2024/08/19/23:17:17/location.parquet",
@@ -382,7 +378,6 @@ class TestLambdaHandler:
             "dim_design/2024/08/21/01:01:01/dim_design.parquet",
             "dim_date/2024/08/21/01:01:01/dim_date.parquet",
         ]
-
     
 
     @pytest.mark.it("Testing Lambda handler to write empty event file list to S3 bucket")

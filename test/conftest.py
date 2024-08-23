@@ -87,6 +87,10 @@ def s3_client(aws_credentials):
         yield client
 
 
+''' 
+Mocking an extract and tranform buckets to test extract and tranform functionality. Also mocking few files adding to extract bucket to read based on the requirements in the testcases.
+Mocking transform bucket files to write parquet based on the requirement of a testcases
+'''
 @pytest.fixture
 def transform_s3_client(aws_credentials):
     """mock aws s3 client with a test ingestion and transformation bucket"""
@@ -118,6 +122,9 @@ def transform_s3_client(aws_credentials):
         client.upload_file('Test_Data/date.parquet', 'test-transformation-bucket', 'dim_date/2024/08/21/01:01:01/dim_date.parquet')
         yield client
 
+''' 
+Mocking an empty tranform bucket and a filled ingestion bucket to test the full load transform functionality
+'''
 @pytest.fixture
 def transform_s3_client_mock_empty_transform_bucket(aws_credentials):
     """mock aws s3 client with an empty test ingestion and transformation bucket"""
