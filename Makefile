@@ -54,6 +54,8 @@ custom-dependencies: create-environment logdirs
 
 	@echo ">>> Installing pg8000 to dependencies/python..."
 	$(call execute_in_env, $(PIP) install pg8000 -t dependencies/python --no-cache-dir)
+	@echo ">>> Installing forex_python to dependencies/python..."
+	$(call execute_in_env, $(PIP) install forex_python -t dependencies/python --no-cache-dir)
 
 all-requirements: requirements custom-dependencies
 ################################################################################################################
@@ -100,9 +102,8 @@ run-flake8: dev-setup
 
 ## Run the unit tests
 unit-test: setup-db
-	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -vvv \
+	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -vvvrP \
 	--ignore=dependencies/python/ \
-	--no-summary \
 	--testdox)
 
 ## Run all tests including test_recorder.py, test_import.py
