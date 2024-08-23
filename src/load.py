@@ -36,9 +36,9 @@ def get_warehouse_credentials() -> dict:
 
 
 def db_connection() -> Connection:
-    '''This function connects to the data warehouse hosted in the cloud
+    """This function connects to the data warehouse hosted in the cloud
     using the credentials stored in aws.
-    It logs an error if the connection fails.'''
+    It logs an error if the connection fails."""
 
     try:
         secret = get_warehouse_credentials()
