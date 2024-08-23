@@ -29,7 +29,8 @@ resource "aws_cloudwatch_metric_alarm" "extract_metric_alarm" {
   statistic                 = "Sum"
   threshold                 = 1
   alarm_description         = "This metric monitors ERROR in loggroup"
-  alarm_actions             = ["arn:aws:sns:eu-west-2:590183674561:user-updates-topic"]
+  # alarm_actions             = ["arn:aws:sns:eu-west-2:590183674561:user-updates-topic"]
+  alarm_actions = [ "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_sns_topic.step_functions_workflow_sns.arn}", "arn:aws:sns:eu-west-2:590183674561:user-updates-topic"]
   actions_enabled           = true
   insufficient_data_actions = []
 }

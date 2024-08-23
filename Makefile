@@ -61,7 +61,7 @@ custom-dependencies: create-environment logdirs
 	@echo ">>> Installing forex-python to dependencies/python..."
 	$(call execute_in_env, $(PIP) install forex-python -t dependencies/python --no-cache-dir)
 
-# all-requirements: requirements custom-dependencies
+all-requirements: requirements custom-dependencies
 
 ## Run Terraform Init
 terraform-init:
