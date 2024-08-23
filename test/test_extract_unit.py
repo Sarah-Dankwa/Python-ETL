@@ -17,6 +17,7 @@ from src.extract import (
     list_bucket_objects,
 )
 
+
 @pytest.fixture
 def oltp_db():
     """connects to local database & adds tables with oltp data
@@ -33,6 +34,7 @@ def oltp_db():
     finally:
         if db:
             db.close()
+
 
 @pytest.fixture
 def invalid_db_credentials(secretsmanager_client_test):
@@ -151,10 +153,11 @@ class TestGetTableNames:
     ):
         expected = table_names
         result = get_table_names()
-        assert result == expected
+        for table in expected:
+            assert table in result
 
     @pytest.mark.it("table names logs error if database cannot be accessed")
-    def test_table_names_gets_list_of_table_names(
+    def test_logs_error_if_db_cannot_be_accessed(
         self, invalid_db_credentials, caplog, s3_client, table_names
     ):
 

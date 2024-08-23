@@ -63,8 +63,8 @@ class TestOLTPSeedTables:
     @pytest.mark.it("test expected tables exist in OLTP database")
     def test_expected_tables_exist_in_OLTP_test_database(self, oltp_db):
         query = """
-            SELECT table_name 
-            FROM information_schema.tables 
+            SELECT table_name
+            FROM information_schema.tables
             WHERE table_schema = 'public';"""
         expected = get_oltp_tables()
         result = oltp_db.run(query)
@@ -124,8 +124,8 @@ class TestWarehouseSeed:
     @pytest.mark.it("test expected tables exist in test warehouse")
     def test_expected_tables_exist_in_test_warehouse(self, warehouse_db):
         query = """
-            SELECT table_name 
-            FROM information_schema.tables 
+            SELECT table_name
+            FROM information_schema.tables
             WHERE table_schema = 'public';"""
 
         expected = get_warehouse_tables()

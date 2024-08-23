@@ -32,7 +32,7 @@ def get_insert_query(table: str, data: list) -> str:
     query = f"""
     INSERT INTO {identifier(table)} (
     {', '. join(columns)}
-    ) VALUES 
+    ) VALUES
     {', '.join(data_list)}"""
     return query
 

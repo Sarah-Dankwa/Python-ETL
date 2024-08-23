@@ -75,7 +75,7 @@ class TestFetchFromDB:
     @pytest.mark.it("info message logged for each table added")
     @patch("src.extract.get_table_names")
     @patch("src.extract.get_single_table", return_value=[{"key1": "value1"}])
-    def test_full_fetch_calls_get_single_table(
+    def test_info_logged_for_each_table_added(
         self, mock_single_table, mock_table_names, table_names, caplog, s3_client
     ):
         mock_table_names.return_value = table_names
