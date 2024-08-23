@@ -1,10 +1,7 @@
 import pytest
-from pg8000.native import Connection
-from datetime import datetime
-from unittest.mock import patch, call, Mock
+from unittest.mock import patch, call
 import logging
 import json
-import pyarrow.parquet as pq
 from src.extract import list_bucket_objects, fetch_from_db, lambda_handler
 
 
