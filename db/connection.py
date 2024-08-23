@@ -5,6 +5,8 @@ import os
 load_dotenv('.env')
 
 def connect_to_db():
+    """returns a pg8000 connection to the test database"""
+
     return Connection(
         user=os.getenv("LOCAL_USER"),
         password=os.getenv("LOCAL_PASSWORD"),

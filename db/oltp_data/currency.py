@@ -1,3 +1,5 @@
+"""test data for the currency table in the oltp database"""
+
 currency = [
     {
         "currency_id": 1,

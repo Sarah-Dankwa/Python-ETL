@@ -1,3 +1,5 @@
+"""test data for the counterparty table in the oltp database"""
+
 counterparty = [
     {
         "counterparty_id": 1,

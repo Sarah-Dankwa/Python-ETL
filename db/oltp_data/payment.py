@@ -1,3 +1,5 @@
+"""test data for the payment table in the oltp database"""
+
 payment = [
     {
         'payment_id': 1,

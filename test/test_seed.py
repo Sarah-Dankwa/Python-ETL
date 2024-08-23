@@ -11,8 +11,7 @@ from db.seed import (
     seed_warehouse, 
     seed_oltp, 
     get_oltp_tables, 
-    get_warehouse_tables, 
-    teardown_db
+    get_warehouse_tables
 )
 
 @pytest.fixture(scope='class')

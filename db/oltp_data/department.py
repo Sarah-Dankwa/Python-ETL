@@ -1,3 +1,5 @@
+"""test data for the department table in the oltp database"""
+
 department = [
     {
         "department_id": 1,

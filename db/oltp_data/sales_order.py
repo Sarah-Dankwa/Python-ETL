@@ -1,3 +1,5 @@
+"""test data for the sales_order table in the oltp database"""
+
 sales_order = [
     {
         'sales_order_id': 1,

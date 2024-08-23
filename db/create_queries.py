@@ -1,4 +1,5 @@
 def get_oltp_queries():
+    """queries to create expected tables in mock oltp database"""
     
     payment_type = """
     CREATE TABLE payment_type (
