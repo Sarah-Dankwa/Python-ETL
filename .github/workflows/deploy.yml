@@ -50,8 +50,13 @@ jobs:
         # sets up database
         - name: Setup Database
           run: make setup-db
-        - name: Run Requirements
-          run: make all-requirements
+
+        - name: Install Dependencies
+          run: make custom-dependencies
+
+        # - name: Run Requirements
+        #   run: make all-requirements
+        
         - name: Run Dev-Setup
           run: make dev-setup
         - name: Run Tests

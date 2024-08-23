@@ -74,6 +74,9 @@
       "Catch": [
         {
           "ErrorEquals": [
+            "pg8000.exceptions.DatabaseError", 
+            "pg8000.exceptions.InterfaceError", 
+            "botocore.exceptions.ClientError", 
             "States.ALL"
           ],
           "Comment": "catch any error in load lambda function",
