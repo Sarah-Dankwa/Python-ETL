@@ -403,7 +403,9 @@ data "aws_iam_policy_document" "s3_document_transform"{
 
         resources = [
             "${aws_s3_bucket.processed_data_bucket.arn}/*",
-            "${aws_s3_bucket.processed_data_bucket.arn}"
+            "${aws_s3_bucket.processed_data_bucket.arn}",
+            "${aws_s3_bucket.ingested_data_bucket.arn}/*",
+            "${aws_s3_bucket.ingested_data_bucket.arn}"
         ]       
     }
 
