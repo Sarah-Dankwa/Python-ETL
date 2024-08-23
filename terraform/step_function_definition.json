@@ -4,7 +4,7 @@
   "States": {
     "ExtractTaskLambda": {
       "Next": "TransformTaskLambda",
-      "Resource": "arn:aws:lambda:eu-west-2:590183674561:function:extract",
+      "Resource": "arn:aws:lambda:${aws_region}:${account_id}:function:extract",
       "Type": "Task",
       "Retry": [
         {
@@ -32,9 +32,8 @@
       "Type": "Task",
       "Resource": "arn:aws:states:::sns:publish",
       "Parameters": {
-        "TopicArn": "arn:aws:sns:eu-west-2:590183674561:totesys-workflow-step-functions-notifications",
+        "TopicArn": "${sns_topic_arn}",
         "Message": {
-          "Input.$": "$",
           "Error.$": "$.errorInfo"
         },
         "Subject": "Step Function Failure Notification",
@@ -54,7 +53,7 @@
     },
     "TransformTaskLambda": {
       "Next": "LoadTaskLambda",
-      "Resource": "arn:aws:lambda:eu-west-2:590183674561:function:transform",
+      "Resource": "arn:aws:lambda:${aws_region}:${account_id}:function:transform",
       "Type": "Task",
       "Catch": [
         {
@@ -69,14 +68,11 @@
     },
     "LoadTaskLambda": {
       "End": true,
-      "Resource": "arn:aws:lambda:eu-west-2:590183674561:function:load",
+      "Resource": "arn:aws:lambda:${aws_region}:${account_id}:function:load",
       "Type": "Task",
       "Catch": [
         {
           "ErrorEquals": [
-            "pg8000.exceptions.DatabaseError", 
-            "pg8000.exceptions.InterfaceError", 
-            "botocore.exceptions.ClientError", 
             "States.ALL"
           ],
           "Comment": "catch any error in load lambda function",

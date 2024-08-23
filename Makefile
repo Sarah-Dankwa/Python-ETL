@@ -87,7 +87,7 @@ terraform-destroy: custom-dependencies terraform-init
 clean-dependencies:
 	@echo ">>> Cleanig dependencies/python ..."
 	rm -rf dependencies/python
-	rm -rf venv
+## rm -rf venv
 
 
 ################################################################################################################

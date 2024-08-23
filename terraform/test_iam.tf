@@ -119,7 +119,7 @@ data "aws_iam_policy_document" "cloudwatch_sns_policy_document" {
     resources = [
       "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:user-updates-topic",
       # "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_sns_topic.step_functions_workflow_sns.arn}"
-      "${aws_sns_topic.step_functions_workflow_sns.arn}"
+      "${data.aws_sns_topic.step_functions_workflow_sns.arn}"
     ]
   }
 }
