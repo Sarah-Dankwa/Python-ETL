@@ -1,10 +1,11 @@
 import pytest
 from pg8000.native import Connection
 from datetime import datetime
-from unittest.mock import patch, call, Mock
+from unittest.mock import patch
 import logging
 import json
 import pyarrow.parquet as pq
+from db.seed import seed_oltp
 from src.extract import (
     get_database_credentials,
     connect_to_db,
@@ -16,6 +17,22 @@ from src.extract import (
     list_bucket_objects,
 )
 
+@pytest.fixture
+def oltp_db():
+    """connects to local database & adds tables with oltp data
+
+    yields a connection to the local database
+    then closes the connection
+    """
+
+    db = None
+    try:
+        db = connect_to_db()
+        seed_oltp(db)
+        yield db
+    finally:
+        if db:
+            db.close()
 
 @pytest.fixture
 def invalid_db_credentials(secretsmanager_client_test):
@@ -77,14 +94,14 @@ class TestGetSingleTable:
     """test get single table function"""
 
     @pytest.mark.it("Test returns a list of dictionaries")
-    def test_returns_list_of_dictionaries(self, secretsmanager_client):
+    def test_returns_list_of_dictionaries(self, secretsmanager_client, oltp_db):
         results = get_single_table("payment_type")
         assert isinstance(results, list)
         for item in results:
             assert isinstance(item, dict)
 
     @pytest.mark.it("Test returns correct keys for payment type table")
-    def test_returns_expected_keys(self, secretsmanager_client):
+    def test_returns_expected_keys(self, secretsmanager_client, oltp_db):
         results = get_single_table("payment_type")
         assert "payment_type_id" in results[0]
         assert "payment_type_name" in results[0]
@@ -92,14 +109,14 @@ class TestGetSingleTable:
         assert "last_updated" in results[0]
 
     @pytest.mark.it("when given date only returns entries after given date")
-    def test_filters_table_by_given_date(self, secretsmanager_client):
+    def test_filters_table_by_given_date(self, secretsmanager_client, oltp_db):
         sample_date = datetime(2022, 10, 20)
         results = get_single_table("sales_order", sample_date)
         for row in results:
             assert row["last_updated"] > sample_date
 
     @pytest.mark.it("logs error if table not found")
-    def test_logs_error_with_invalid_table(self, secretsmanager_client, caplog):
+    def test_logs_error_with_invalid_table(self, caplog, secretsmanager_client, oltp_db):
         with caplog.at_level(logging.INFO):
             get_single_table("table_not_in_db")
             assert 'relation "table_not_in_db" does not exist' in caplog.text
