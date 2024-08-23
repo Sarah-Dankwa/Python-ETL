@@ -67,6 +67,11 @@ def get_warehouse_credentials() -> dict:
             send_sns_notification(error_msg)
 
             raise
+            
+def db_connection() -> Connection:
+    """This function connects to the data warehouse hosted in the cloud
+    using the credentials stored in aws.
+    It logs an error if the connection fails."""
 
 def db_connection() -> Connection:
     try:

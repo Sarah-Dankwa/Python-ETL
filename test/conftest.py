@@ -40,9 +40,7 @@ def now_variable():
 
 
 @pytest.fixture
-def secretsmanager_client(
-    aws_credentials, environment_variables, secretsmanager_client_test
-):
+def secretsmanager_client(aws_credentials, environment_variables, secretsmanager_client_test):
     """mock boto3 secretsmanager client with db credentials from local .env"""
     # load_dotenv()
     secret = {}
@@ -73,7 +71,6 @@ def ssm_client(aws_credentials):
     with mock_aws():
         yield boto3.client("ssm", region_name="eu-west-2")
 
-
 @pytest.fixture
 def s3_client(aws_credentials):
     """mock aws s3 client with a test ingestion and transformation bucket"""
@@ -85,6 +82,68 @@ def s3_client(aws_credentials):
         )
         client.create_bucket(
             Bucket="test-transformation-bucket",
+            CreateBucketConfiguration={"LocationConstraint": "eu-west-2"},
+        )
+        yield client
+
+
+''' 
+Mocking an extract and tranform buckets to test extract and tranform functionality. Also mocking few files adding to extract bucket to read based on the requirements in the testcases.
+Mocking transform bucket files to write parquet based on the requirement of a testcases
+'''
+@pytest.fixture
+def transform_s3_client(aws_credentials):
+    """mock aws s3 client with a test ingestion and transformation bucket"""
+    with mock_aws():
+        client = boto3.client("s3")
+        client.create_bucket(
+            Bucket="test-ingestion-bucket",
+            CreateBucketConfiguration={"LocationConstraint": "eu-west-2"},
+        )
+        client.upload_file('Test_Data/sales_order.parquet', 'test-ingestion-bucket', 'sales_order/2024/08/19/23:17:17/sales_order.parquet')
+        client.upload_file('Test_Data/design.parquet', 'test-ingestion-bucket', 'design/2024/08/19/23:17:17/design.parquet')
+        client.upload_file('Test_Data/currency.parquet', 'test-ingestion-bucket', 'currency/2024/08/19/23:17:17/currency.parquet')
+        client.upload_file('Test_Data/department.parquet', 'test-ingestion-bucket', 'department/2024/08/19/23:17:17/department.parquet')
+        client.upload_file('Test_Data/staff.parquet', 'test-ingestion-bucket', 'staff/2024/08/19/23:17:17/staff.parquet')
+        client.upload_file('Test_Data/counterparty.parquet', 'test-ingestion-bucket', 'counterparty/2024/08/19/23:17:17/counterparty.parquet')
+        client.upload_file('Test_Data/address.parquet', 'test-ingestion-bucket', 'address/2024/08/19/23:17:17/address.parquet')
+        client.upload_file('Test_Data/sales_order2.parquet', 'test-ingestion-bucket', "sales_order/2024/08/20/23:17:18/23:17:17/sales_order.parquet")
+        client.create_bucket(
+            Bucket="test-transformation-bucket",
+            CreateBucketConfiguration={"LocationConstraint": "eu-west-2"},
+        )
+        client.upload_file('Test_Data/sales_order.parquet', 'test-transformation-bucket', 'sales_order/2024/08/20/05:05:05/sales_order.parquet')
+        client.upload_file('Test_Data/sales_order.parquet', 'test-transformation-bucket', 'fact_sales_order/2024/08/21/01:01:01/fact_sales_order.parquet')
+        client.upload_file('Test_Data/address.parquet', 'test-transformation-bucket', 'dim_location/2024/08/21/01:01:01/dim_location.parquet')
+        client.upload_file('Test_Data/counterparty.parquet', 'test-transformation-bucket', 'dim_counterparty/2024/08/21/01:01:01/dim_counterparty.parquet')
+        client.upload_file('Test_Data/staff.parquet', 'test-transformation-bucket', 'dim_staff/2024/08/21/01:01:01/dim_staff.parquet')
+        client.upload_file('Test_Data/currency.parquet', 'test-transformation-bucket', 'dim_currency/2024/08/21/01:01:01/dim_currency.parquet')
+        client.upload_file('Test_Data/design.parquet', 'test-transformation-bucket', 'dim_design/2024/08/21/01:01:01/dim_design.parquet')
+        client.upload_file('Test_Data/date.parquet', 'test-transformation-bucket', 'dim_date/2024/08/21/01:01:01/dim_date.parquet')
+        yield client
+
+''' 
+Mocking an empty tranform bucket and a filled ingestion bucket to test the full load transform functionality
+'''
+@pytest.fixture
+def transform_s3_client_mock_empty_transform_bucket(aws_credentials):
+    """mock aws s3 client with an empty test ingestion and transformation bucket"""
+    with mock_aws():
+        client = boto3.client("s3")
+        client.create_bucket(
+            Bucket="test-ingestion-bucket",
+            CreateBucketConfiguration={"LocationConstraint": "eu-west-2"},
+        )
+        client.upload_file('Test_Data/sales_order.parquet', 'test-ingestion-bucket', 'sales_order/2024/08/19/23:17:17/sales_order.parquet')
+        client.upload_file('Test_Data/design.parquet', 'test-ingestion-bucket', 'design/2024/08/19/23:17:17/design.parquet')
+        client.upload_file('Test_Data/currency.parquet', 'test-ingestion-bucket', 'currency/2024/08/19/23:17:17/currency.parquet')
+        client.upload_file('Test_Data/department.parquet', 'test-ingestion-bucket', 'department/2024/08/19/23:17:17/department.parquet')
+        client.upload_file('Test_Data/staff.parquet', 'test-ingestion-bucket', 'staff/2024/08/19/23:17:17/staff.parquet')
+        client.upload_file('Test_Data/counterparty.parquet', 'test-ingestion-bucket', 'counterparty/2024/08/19/23:17:17/counterparty.parquet')
+        client.upload_file('Test_Data/address.parquet', 'test-ingestion-bucket', 'address/2024/08/19/23:17:17/address.parquet')
+        client.upload_file('Test_Data/sales_order2.parquet', 'test-ingestion-bucket', "sales_order/2024/08/20/23:17:18/23:17:17/sales_order.parquet")
+        client.create_bucket(
+            Bucket="test-transformation-bucket-empty",
             CreateBucketConfiguration={"LocationConstraint": "eu-west-2"},
         )
         yield client
@@ -107,7 +166,6 @@ def table_names():
         "design",
     ]
     return tables
-
 
 @pytest.fixture
 def valid_warehouse_credentials(aws_credentials, environment_variables):
@@ -132,7 +190,7 @@ def invalid_warehouse_credentials(secretsmanager_client_test):
     """invalid database connections added to mock secrets manager to test
     error handling
     """
-    
+
     secret = {}
     secret["POSTGRES_DATABASE"] = "invalid_db"
     secret["POSTGRES_HOSTNAME"] = "invalid_host"
@@ -162,4 +220,3 @@ def conn():
     finally:
         if db:
             db.close()
-

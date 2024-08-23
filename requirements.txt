@@ -75,3 +75,4 @@ meson
 memory_profiler
 pytest-cov
 pandas
+forex_python
