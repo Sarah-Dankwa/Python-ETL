@@ -11,6 +11,7 @@ from db.oltp_data.sales_order import sales_order
 from db.oltp_data.staff import staff
 from db.oltp_data.transaction import transaction
 
+
 def get_insert_query(table: str, data: list) -> str:
     """returns an SQL insert query for the given data
 
@@ -23,11 +24,11 @@ def get_insert_query(table: str, data: list) -> str:
     columns = [identifier(col) for col in data[0].keys()]
     data_list = []
     for row in data:
-        row_query = '('
-        row_query += ', '.join([literal(data) for data in row.values()])
-        row_query += ')'
+        row_query = "("
+        row_query += ", ".join([literal(data) for data in row.values()])
+        row_query += ")"
         data_list.append(row_query)
-    
+
     query = f"""
     INSERT INTO {identifier(table)} (
     {', '. join(columns)}
@@ -51,28 +52,28 @@ def get_all_insert_queries() -> list:
         design,
         currency,
         department,
-        staff, 
+        staff,
         address,
-        counterparty, 
+        counterparty,
         purchase_order,
         sales_order,
         transaction,
-        payment
+        payment,
     ]
     tables = [
-        'payment_type',
-        'design',
-        'currency',
-        'department',
-        'staff', 
-        'address',
-        'counterparty', 
-        'purchase_order',
-        'sales_order',
-        'transaction',
-        'payment'
+        "payment_type",
+        "design",
+        "currency",
+        "department",
+        "staff",
+        "address",
+        "counterparty",
+        "purchase_order",
+        "sales_order",
+        "transaction",
+        "payment",
     ]
     all_queries = [
-        get_insert_query(table, data) for table, data in zip(tables,all_data)
+        get_insert_query(table, data) for table, data in zip(tables, all_data)
     ]
     return all_queries

@@ -8,7 +8,7 @@ counterparty = [
         "commercial_contact": "Micheal Toy",
         "delivery_contact": "Mrs. Lucy Runolfsdottir",
         "created_at": "2022-11-03 14:20:51.563000",
-        "last_updated": "2022-11-03 14:20:51.563000"
+        "last_updated": "2022-11-03 14:20:51.563000",
     },
     {
         "counterparty_id": 2,
@@ -17,7 +17,7 @@ counterparty = [
         "commercial_contact": "Melba Sanford",
         "delivery_contact": "Jean Hane III",
         "created_at": "2022-11-03 14:20:51.563000",
-        "last_updated": "2022-11-03 14:20:51.563000"
+        "last_updated": "2022-11-03 14:20:51.563000",
     },
     {
         "counterparty_id": 3,
@@ -26,7 +26,7 @@ counterparty = [
         "commercial_contact": "Jane Wiza",
         "delivery_contact": "Myra Kovacek",
         "created_at": "2022-11-03 14:20:51.563000",
-        "last_updated": "2022-11-03 14:20:51.563000"
+        "last_updated": "2022-11-03 14:20:51.563000",
     },
     {
         "counterparty_id": 4,
@@ -35,7 +35,7 @@ counterparty = [
         "commercial_contact": "Taylor Haag",
         "delivery_contact": "Alfredo Cassin II",
         "created_at": "2022-11-03 14:20:51.563000",
-        "last_updated": "2022-11-03 14:20:51.563000"
+        "last_updated": "2022-11-03 14:20:51.563000",
     },
     {
         "counterparty_id": 5,
@@ -44,7 +44,7 @@ counterparty = [
         "commercial_contact": "Homer Mitchell",
         "delivery_contact": "Ivan Balistreri",
         "created_at": "2022-11-03 14:20:51.563000",
-        "last_updated": "2022-11-03 14:20:51.563000"
+        "last_updated": "2022-11-03 14:20:51.563000",
     },
     {
         "counterparty_id": 6,
@@ -53,7 +53,7 @@ counterparty = [
         "commercial_contact": "Florence Casper",
         "delivery_contact": "Eva Upton",
         "created_at": "2022-11-03 14:20:51.563000",
-        "last_updated": "2022-11-03 14:20:51.563000"
+        "last_updated": "2022-11-03 14:20:51.563000",
     },
     {
         "counterparty_id": 7,
@@ -62,7 +62,7 @@ counterparty = [
         "commercial_contact": "Ms. Wilma Witting",
         "delivery_contact": "Christy O'Hara",
         "created_at": "2022-11-03 14:20:51.563000",
-        "last_updated": "2022-11-03 14:20:51.563000"
+        "last_updated": "2022-11-03 14:20:51.563000",
     },
     {
         "counterparty_id": 8,
@@ -71,7 +71,7 @@ counterparty = [
         "commercial_contact": "Emily Orn",
         "delivery_contact": "Veronica Fay",
         "created_at": "2022-11-03 14:20:51.563000",
-        "last_updated": "2022-11-03 14:20:51.563000"
+        "last_updated": "2022-11-03 14:20:51.563000",
     },
     {
         "counterparty_id": 9,
@@ -80,7 +80,7 @@ counterparty = [
         "commercial_contact": "Sheryl Langworth",
         "delivery_contact": "Simon Schoen",
         "created_at": "2022-11-03 14:20:51.563000",
-        "last_updated": "2022-11-03 14:20:51.563000"
+        "last_updated": "2022-11-03 14:20:51.563000",
     },
     {
         "counterparty_id": 10,
@@ -89,6 +89,6 @@ counterparty = [
         "commercial_contact": "Ed Halvorson",
         "delivery_contact": "Dewey Kuhic",
         "created_at": "2022-11-03 14:20:51.563000",
-        "last_updated": "2022-11-03 14:20:51.563000"
-    }
+        "last_updated": "2022-11-03 14:20:51.563000",
+    },
 ]

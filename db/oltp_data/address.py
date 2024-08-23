@@ -10,7 +10,7 @@ address = [
         "country": "Turkey",
         "phone": "1803 637401",
         "created_at": "2022-11-03 14:20:49.962000",
-        "last_updated": "2022-11-03 14:20:49.962000"
+        "last_updated": "2022-11-03 14:20:49.962000",
     },
     {
         "address_id": 2,
@@ -22,7 +22,7 @@ address = [
         "country": "San Marino",
         "phone": "9621 880720",
         "created_at": "2022-11-03 14:20:49.962000",
-        "last_updated": "2022-11-03 14:20:49.962000"
+        "last_updated": "2022-11-03 14:20:49.962000",
     },
     {
         "address_id": 3,
@@ -34,7 +34,7 @@ address = [
         "country": "Samoa",
         "phone": "0730 783349",
         "created_at": "2022-11-03 14:20:49.962000",
-        "last_updated": "2022-11-03 14:20:49.962000"
+        "last_updated": "2022-11-03 14:20:49.962000",
     },
     {
         "address_id": 4,
@@ -46,7 +46,7 @@ address = [
         "country": "Republic of Korea",
         "phone": "1239 706295",
         "created_at": "2022-11-03 14:20:49.962000",
-        "last_updated": "2022-11-03 14:20:49.962000"
+        "last_updated": "2022-11-03 14:20:49.962000",
     },
     {
         "address_id": 5,
@@ -58,7 +58,7 @@ address = [
         "country": "Bosnia and Herzegovina",
         "phone": "0081 009772",
         "created_at": "2022-11-03 14:20:49.962000",
-        "last_updated": "2022-11-03 14:20:49.962000"
+        "last_updated": "2022-11-03 14:20:49.962000",
     },
     {
         "address_id": 6,
@@ -70,7 +70,7 @@ address = [
         "country": "Zimbabwe",
         "phone": "0447 798320",
         "created_at": "2022-11-03 14:20:49.962000",
-        "last_updated": "2022-11-03 14:20:49.962000"
+        "last_updated": "2022-11-03 14:20:49.962000",
     },
     {
         "address_id": 7,
@@ -82,7 +82,7 @@ address = [
         "country": "Faroe Islands",
         "phone": "1373 796260",
         "created_at": "2022-11-03 14:20:49.962000",
-        "last_updated": "2022-11-03 14:20:49.962000"
+        "last_updated": "2022-11-03 14:20:49.962000",
     },
     {
         "address_id": 8,
@@ -94,7 +94,7 @@ address = [
         "country": "United Kingdom",
         "phone": "8935 157571",
         "created_at": "2022-11-03 14:20:49.962000",
-        "last_updated": "2022-11-03 14:20:49.962000"
+        "last_updated": "2022-11-03 14:20:49.962000",
     },
     {
         "address_id": 9,
@@ -106,7 +106,7 @@ address = [
         "country": "Australia",
         "phone": "0768 748652",
         "created_at": "2022-11-03 14:20:49.962000",
-        "last_updated": "2022-11-03 14:20:49.962000"
+        "last_updated": "2022-11-03 14:20:49.962000",
     },
     {
         "address_id": 10,
@@ -118,6 +118,6 @@ address = [
         "country": "Democratic People's Republic of Korea",
         "phone": "4949 998070",
         "created_at": "2022-11-03 14:20:49.962000",
-        "last_updated": "2022-11-03 14:20:49.962000"
-    }
+        "last_updated": "2022-11-03 14:20:49.962000",
+    },
 ]

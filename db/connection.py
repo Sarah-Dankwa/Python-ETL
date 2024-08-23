@@ -2,7 +2,8 @@ from pg8000.native import Connection
 from dotenv import load_dotenv
 import os
 
-load_dotenv('.env')
+load_dotenv(".env")
+
 
 def connect_to_db():
     """returns a pg8000 connection to the test database"""
@@ -12,5 +13,5 @@ def connect_to_db():
         password=os.getenv("LOCAL_PASSWORD"),
         database=os.getenv("LOCAL_DATABASE"),
         host=os.getenv("LOCAL_HOST"),
-        port=int(os.getenv("LOCAL_PORT"))
+        port=int(os.getenv("LOCAL_PORT")),
     )
