@@ -18,11 +18,6 @@ Add following secrets to github secrets
 
 |Secret|Value|
 |------|-----|
-TOTESYS_DATABASE|name of OLTP database
-TOTESYS_HOSTNAME|hostname of OLTP database
-TOTESYS_USERNAME|username for OLTP database
-TOTESYS_PASSWORD|password for OLTP database
-TOTESYS_PORT|5432
 AWS_ACCESS_KEY_ID|aws secret access key OD
 AWS_SECRET_ACCESS_KEY|aws secret access key
 AWS_REGION|aws default region
