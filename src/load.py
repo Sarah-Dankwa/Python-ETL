@@ -159,7 +159,7 @@ def lambda_handler(event: list, context):
             df = get_latest_data_for_one_table(key)
             if df is not None:
                 table_name = key.split('/')[0]
-                # insert_new_data_into_data_warehouse(df, table_name)
+                insert_new_data_into_data_warehouse(df, table_name)
     except Exception as e:
         error_details = {
             "errorMessage": str(e),
