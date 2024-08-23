@@ -44,11 +44,11 @@ def secretsmanager_client(aws_credentials, environment_variables, secretsmanager
     """mock boto3 secretsmanager client with db credentials from local .env"""
     # load_dotenv()
     secret = {}
-    secret["Database"] = os.environ["TOTESYS_DATABASE"]
-    secret["Hostname"] = os.environ["TOTESYS_HOSTNAME"]
-    secret["Username"] = os.environ["TOTESYS_USERNAME"]
-    secret["Password"] = os.environ["TOTESYS_PASSWORD"]
-    secret["Port"] = os.environ["TOTESYS_PORT"]
+    secret["Database"] = os.environ["LOCAL_DATABASE"]
+    secret["Hostname"] = os.environ["LOCAL_HOST"]
+    secret["Username"] = os.environ["LOCAL_USER"]
+    secret["Password"] = os.environ["LOCAL_PASSWORD"]
+    secret["Port"] = os.environ["LOCAL_PORT"]
     json_secret = json.dumps(secret)
     with mock_aws():
         client = boto3.client("secretsmanager", region_name="eu-west-2")
@@ -220,3 +220,5 @@ def conn():
     finally:
         if db:
             db.close()
+
+
