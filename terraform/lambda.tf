@@ -98,8 +98,8 @@ resource "aws_lambda_function" "workflow_tasks_transform" {
   # Lambda function has environment variables that can be used in lambda function
   environment {
     variables = {
+      DATA_INGESTED_BUCKET_NAME = aws_s3_bucket.ingested_data_bucket.id
       DATA_PROCESSED_BUCKET_NAME = aws_s3_bucket.processed_data_bucket.id
-      KEY_NAME = "processed_data"
     } 
   }
   
