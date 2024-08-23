@@ -370,13 +370,13 @@ class TestLambdaHandler:
         ]
         file_path_list = lambda_handler(event=events)
         assert file_path_list == [
-            "fact_sales_order/2024/08/21/01:01:01/fact_sales_order.parquet",
             "dim_location/2024/08/21/01:01:01/dim_location.parquet",
             "dim_counterparty/2024/08/21/01:01:01/dim_counterparty.parquet",
             "dim_staff/2024/08/21/01:01:01/dim_staff.parquet",
             "dim_currency/2024/08/21/01:01:01/dim_currency.parquet",
             "dim_design/2024/08/21/01:01:01/dim_design.parquet",
             "dim_date/2024/08/21/01:01:01/dim_date.parquet",
+            "fact_sales_order/2024/08/21/01:01:01/fact_sales_order.parquet"
         ]
     
 
