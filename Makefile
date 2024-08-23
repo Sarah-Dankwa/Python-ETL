@@ -47,17 +47,51 @@ custom-dependencies: create-environment logdirs
 	
 	@echo ">>> Setting up dependencies/python directory..."
 	mkdir -p dependencies/python
-	rm -rf dependencies/python/*
+##  rm -rf dependencies/python/*
 
 ##	@echo ">>> Installing pandas to dependencies/python..."
 ##	$(call execute_in_env, $(PIP) install pandas -t dependencies/python --no-cache-dir)
+
+##  @echo ">>> Installing requirements.txt to dependencies/python..."
+##  $(call execute_in_env, $(PIP) install -r ./requirements.txt -t dependencies/python --no-cache-dir)
 
 	@echo ">>> Installing pg8000 to dependencies/python..."
 	$(call execute_in_env, $(PIP) install pg8000 -t dependencies/python --no-cache-dir)
 	@echo ">>> Installing forex_python to dependencies/python..."
 	$(call execute_in_env, $(PIP) install forex_python -t dependencies/python --no-cache-dir)
 
+	@echo ">>> Installing forex-python to dependencies/python..."
+	$(call execute_in_env, $(PIP) install forex-python -t dependencies/python --no-cache-dir)
+
 all-requirements: requirements custom-dependencies
+
+## Run Terraform Init
+terraform-init:
+	@echo ">>> Initializing Terraform"
+	cd terraform && terraform init
+
+## Run Terraform Plan
+terraform-plan: custom-dependencies terraform-init
+	@echo ">>> Running Terraform Plan ..."
+	cd terraform && terraform plan
+
+## Run Terraform Apply
+terraform-apply: custom-dependencies terraform-init
+	@echo ">>> Running Terraform Apply ..."
+	cd terraform && terraform apply -auto-approve
+
+## Run Terraform Destroy
+terraform-destroy: custom-dependencies terraform-init
+	@echo ">>> Destroying Terraform-managed infrastructure ..."
+	cd terraform && terraform destroy -auto-approve
+
+# Clean up dependencies after deployment 
+clean-dependencies:
+	@echo ">>> Cleanig dependencies/python ..."
+	rm -rf dependencies/python
+## rm -rf venv
+
+
 ################################################################################################################
 # Set Up
 ## Install bandit
@@ -82,6 +116,9 @@ flake8:
 
 ## Set up dev requirements (bandit, safety, flake8)
 dev-setup: bandit safety black coverage flake8
+
+################################################################################################################
+## Test and Security
 
 ## Run set up test warehouse database
 setup-db:
@@ -113,12 +150,21 @@ unit-test-all: setup-db
 ## Run the coverage check
 check-coverage:
 	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest --cov=src test/)
-# $(call execute_in_env, PYTHONPATH=${PYTHONPATH} coverage run \
+##  $(call execute_in_env, PYTHONPATH=${PYTHONPATH} coverage run \
 	# --omit=venv/* --omit=dependencies/python/ \
 	# -m pytest && coverage report --omit=venv/* --omit=dependencies/python/ -m)
 
-
-
-## Run all checks
+## Run all checks (black, security, unit tests, coverage)
 run-checks:  run-black security-test unit-test check-coverage 
-## 
+
+################################################################################################################
+## Utility
+
+## Full workflow: Clean, set up environment, run Terraform plan
+plan: clean-dependencies custom-dependencies terraform-plan
+
+## Full workflow: Clean, set up environment, apply Terraform changes
+apply: clean-dependencies custom-dependencies terraform-apply
+
+## Full workflow: Clean, set up environment, destroy Terraform infrastructure
+destroy: clean-dependencies custom-dependencies terraform-destroy

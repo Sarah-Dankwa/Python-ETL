@@ -57,6 +57,7 @@ resource "aws_lambda_function" "workflow_tasks_extract" {
   environment {
     variables = {
       DATA_INGESTED_BUCKET_NAME = aws_s3_bucket.ingested_data_bucket.id
+      SNS_TOPIC_ARN              = data.aws_sns_topic.step_functions_workflow_sns.arn
       KEY_NAME = "ingested_data"
     } 
   }
@@ -100,6 +101,7 @@ resource "aws_lambda_function" "workflow_tasks_transform" {
     variables = {
       DATA_INGESTED_BUCKET_NAME = aws_s3_bucket.ingested_data_bucket.id
       DATA_PROCESSED_BUCKET_NAME = aws_s3_bucket.processed_data_bucket.id
+      SNS_TOPIC_ARN              = data.aws_sns_topic.step_functions_workflow_sns.arn
     } 
   }
   
@@ -136,6 +138,7 @@ resource "aws_lambda_function" "workflow_tasks_load" {
   environment {
     variables = {
       DATA_PROCESSED_BUCKET_NAME = aws_s3_bucket.processed_data_bucket.id
+      SNS_TOPIC_ARN              = data.aws_sns_topic.step_functions_workflow_sns.arn
     } 
   }
 
