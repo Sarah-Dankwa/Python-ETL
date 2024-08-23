@@ -6,7 +6,7 @@ def seed(db: Connection, queries: list, insert_queries:list = None):
     tables = get_warehouse_tables()
     tables += get_oltp_tables()
 
-    teardown(db, tables)
+    teardown_db(db, tables)
     for query in queries:
         db.run(query)
     
@@ -15,7 +15,7 @@ def seed(db: Connection, queries: list, insert_queries:list = None):
             db.run(query)
 
 
-def teardown(db: Connection, tables: list):
+def teardown_db(db: Connection, tables: list):
     for table in tables:
         db.run(f'DROP TABLE IF EXISTS {identifier(table)};')
 
@@ -26,6 +26,8 @@ def seed_warehouse(db: Connection):
     Args: 
         db - database connection
     """
+    tables = get_warehouse_tables()
+    teardown_db(db, tables)
     queries = get_warehouse_queries()
     seed(db, queries)
 

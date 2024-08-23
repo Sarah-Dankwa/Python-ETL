@@ -698,19 +698,5 @@ sales_order = [
         'agreed_delivery_date': '2022-12-09',
         'agreed_payment_date': '2022-12-09',
         'agreed_delivery_location_id': 10
-    },
-    {
-        'sales_order_id': 57,
-        'created_at': '2022-12-05 18:14:10.350000',
-        'last_updated': '2022-12-05 18:14:10.350000',
-        'design_id': 7,
-        'staff_id': 6,
-        'counterparty_id': 10,
-        'units_sold': 52026,
-        'unit_price': '2.22',
-        'currency_id': 3,
-        'agreed_delivery_date': '2022-12-08',
-        'agreed_payment_date': '2022-12-06',
-        'agreed_delivery_location_id': 4
     }
 ]
