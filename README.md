@@ -122,6 +122,7 @@ LOCAL_HOST=localhost
 LOCAL_PORT=5432
 DATA_INGESTED_BUCKET_NAME=test-ingestion-bucket
 DATA_PROCESSED_BUCKET_NAME=test-processed-bucket
+SNS_TOPIC_ARN: test-arn
 ```
 
 then run the following command
