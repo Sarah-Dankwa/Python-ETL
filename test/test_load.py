@@ -39,15 +39,6 @@ def test_bucket_var():
 
 
 @pytest.fixture
-def sns_and_topic(aws_credentials):
-    with mock_aws():
-        client = boto3.client("sns", region_name="eu-west-2")
-        test_topic = client.create_topic(Name="test-topic")
-        topic_arn = test_topic["TopicArn"]
-        yield client, topic_arn
-
-
-@pytest.fixture
 def bucket_with_data(s3_client):
     fact_filename = "db/transformed_data/fact_sales_order.parquet"
     fact_key = "test_file.parquet"

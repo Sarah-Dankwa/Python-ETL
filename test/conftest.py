@@ -216,3 +216,10 @@ def warehouse_conn():
             db.close()
 
 
+@pytest.fixture
+def sns_and_topic(aws_credentials):
+    with mock_aws():
+        client = boto3.client("sns", region_name="eu-west-2")
+        test_topic = client.create_topic(Name="test-topic")
+        topic_arn = test_topic["TopicArn"]
+        yield client, topic_arn
