@@ -218,8 +218,6 @@ def warehouse_conn():
 
 @pytest.fixture
 def sns_and_topic(aws_credentials):
-    os.environ["AWS_ACCESS_KEY_ID"] = "testing"
-    os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
     with mock_aws():
         client = boto3.client("sns", region_name="eu-west-2")
         test_topic = client.create_topic(Name="test-topic")
