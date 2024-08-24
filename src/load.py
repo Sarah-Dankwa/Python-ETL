@@ -15,7 +15,7 @@ SNS_TOPIC_ARN = os.environ["SNS_TOPIC_ARN"]
 logger = logging.getLogger()
 logging.getLogger().setLevel(logging.INFO)
 
-sns_client = boto3.client("sns")
+sns_client = boto3.client("sns", region_name="eu-west-2")
 
 
 def send_sns_notification(message: str):
