@@ -41,7 +41,7 @@ def test_bucket_var():
 @pytest.fixture
 def sns_and_topic():
     with mock_aws():
-        client = boto3.client("sns")
+        client = boto3.client("sns", region_name="eu-west-2")
         test_topic = client.create_topic(Name="test-topic")
         topic_arn = test_topic["TopicArn"]
         yield client, topic_arn
@@ -69,7 +69,7 @@ class TestSendSNSNotification:
     @pytest.mark.it("test sns publishes expected message")
     def test_sns_publishes_expected_message(self, sns_and_topic):
         sns, topic_arn = sns_and_topic
-        sqs = boto3.client("sqs")
+        sqs = boto3.client("sqs", region_name="eu-west-2")
         queue = sqs.create_queue(
             QueueName="test-queue",
         )
