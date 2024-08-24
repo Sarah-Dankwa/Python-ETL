@@ -34,12 +34,6 @@ def environment_variables():
 
 
 @pytest.fixture
-def now_variable():
-    with patch.object("src.extract.now", datetime(2024, 10, 15, 20, 25)) as dt:
-        yield dt
-
-
-@pytest.fixture
 def secretsmanager_client(aws_credentials, environment_variables, secretsmanager_client_test):
     """mock boto3 secretsmanager client with db credentials from local .env"""
     # load_dotenv()
@@ -205,7 +199,7 @@ def invalid_warehouse_credentials(secretsmanager_client_test):
 
 
 @pytest.fixture
-def conn():
+def warehouse_conn():
     """connects to local database & adds empty tables
     
     yields a connection to the local database 

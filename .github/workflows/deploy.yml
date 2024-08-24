@@ -26,6 +26,7 @@ jobs:
       env:
         DATA_INGESTED_BUCKET_NAME: test-ingestion-bucket
         DATA_PROCESSED_BUCKET_NAME: test-processed-bucket
+        SNS_TOPIC_ARN: test-arn
         # environment vars for local database on virtual machine
         LOCAL_USER: postgres
         LOCAL_PASSWORD: postgres
