@@ -39,7 +39,7 @@ def test_bucket_var():
 
 
 @pytest.fixture
-def sns_and_topic():
+def sns_and_topic(aws_credentials):
     with mock_aws():
         client = boto3.client("sns", region_name="eu-west-2")
         test_topic = client.create_topic(Name="test-topic")
@@ -66,8 +66,9 @@ class TestSendSNSNotification:
                 send_sns_notification("test_message")
                 assert f"SNS_TOPIC_ARN: {topic_arn}" in caplog.text
 
+    @mock_aws
     @pytest.mark.it("test sns publishes expected message")
-    def test_sns_publishes_expected_message(self, sns_and_topic):
+    def test_sns_publishes_expected_message(self, sns_and_topic, aws_credentials):
         sns, topic_arn = sns_and_topic
         sqs = boto3.client("sqs", region_name="eu-west-2")
         queue = sqs.create_queue(
