@@ -1,14 +1,14 @@
 import pytest
 import os
 import boto3
-from moto import mock_aws
+from moto import mock_aws, mock_sns
 from dotenv import load_dotenv
 import json
 from db.connection import connect_to_db
 from unittest.mock import patch
-from datetime import datetime
 from db.seed import seed_warehouse
-
+import moto
+print(dir(mock_sns))
 
 @pytest.fixture(scope="session")
 def aws_credentials():
@@ -218,6 +218,8 @@ def warehouse_conn():
 
 @pytest.fixture
 def sns_and_topic(aws_credentials):
+    os.environ["AWS_ACCESS_KEY_ID"] = "testing"
+    os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
     with mock_aws():
         client = boto3.client("sns", region_name="eu-west-2")
         test_topic = client.create_topic(Name="test-topic")
