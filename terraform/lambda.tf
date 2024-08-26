@@ -64,7 +64,7 @@ resource "aws_lambda_function" "workflow_tasks_extract" {
   # Lambda function has a logging configuration defined as follows
   logging_config {
     log_format = "JSON"
-    log_group = aws_cloudwatch_log_group.alapin_extract_log_group.name
+    log_group = aws_cloudwatch_log_group.alapin_log_group.name
     application_log_level = "INFO"
     system_log_level = "DEBUG"
 
@@ -109,7 +109,7 @@ resource "aws_lambda_function" "workflow_tasks_transform" {
   # Lambda function has a logging configuration defined as follows
   logging_config {
     log_format = "JSON"
-    log_group = aws_cloudwatch_log_group.alapin_extract_log_group.name
+    log_group = aws_cloudwatch_log_group.alapin_log_group.name
     application_log_level = "INFO"
     system_log_level = "DEBUG"
 
@@ -144,10 +144,12 @@ resource "aws_lambda_function" "workflow_tasks_load" {
 
    logging_config {
     log_format = "JSON"
-    log_group = aws_cloudwatch_log_group.alapin_extract_log_group.name
+    log_group = aws_cloudwatch_log_group.alapin_log_group.name
     application_log_level = "INFO"
     system_log_level = "DEBUG"
 
   }
+
+  
 
 }

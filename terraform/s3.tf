@@ -1,9 +1,11 @@
 resource "aws_s3_bucket" "ingested_data_bucket" {
   bucket_prefix = "nc-de-totesys-ingested-data-"
+  force_destroy = true
 }
 
 resource "aws_s3_bucket" "processed_data_bucket" {
   bucket_prefix = "nc-de-totesys-processed-data-"
+  force_destroy = true
 }
 
 resource "aws_s3_bucket" "code_bucket" {

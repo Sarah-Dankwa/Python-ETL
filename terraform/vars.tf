@@ -20,10 +20,10 @@ variable "state_machine_name" {
 
 variable "metric_namespace" {
   type = string
-  default = "alapin_extract_metric"
+  default = "alapin_metric"
 }
 
 variable "alarm_name" {
   type = string
-  default = "terraform-extract-metric-alarm"
+  default = "terraform-metric-alarm"
 }

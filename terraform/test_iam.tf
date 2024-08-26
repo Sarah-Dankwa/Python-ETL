@@ -67,8 +67,7 @@ data "aws_iam_policy_document" "eventbridge_step_functions_policy_document" {
              "states:StartExecution"
              ]
             resources= [
-                # "arn:aws:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:event-bus/*" #needs to update with step function name instead of *
-                "arn:aws:states:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:stateMachine:${var.state_machine_name}"
+                  "arn:aws:states:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:stateMachine:${var.state_machine_name}"
             ]
             effect= "Allow"
         }
@@ -176,13 +175,9 @@ data "aws_iam_policy_document" "cw_document_extract" {
   statement {
     effect   = "Allow"
     actions  = ["logs:CreateLogStream", "logs:PutLogEvents"]
-    resources = [
-      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.extract_lambda}:*",
-      "arn:aws:logs:eu-west-2:026090521693:log-group:${aws_cloudwatch_log_group.alapin_extract_log_group.name}:*"
-    ]
+    resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${aws_cloudwatch_log_group.alapin_log_group.name}:*"]
   }
 }
-
 
 // Set up terraform IAMS permissions for Lambda - Cloudwatch
 resource "aws_iam_policy" "cw_policy_extract" {
@@ -292,41 +287,6 @@ resource "aws_iam_role_policy_attachment" "ssm_policy_attachment_extract" {
 }
 
 
-# ===============================
-# RDS Policy for Extract Lambda
-# ===============================
-
-
-//Set up terraform IAMS permissions for Lambda - RDS - Needs a discussion on if we really need it or not
-
-# data "aws_iam_policy_document" "rds_policy_document" {
-#   statement {
-#     effect = "Allow"
-#     actions = [
-#       "rds:DescribeDBInstances",
-#       "rds:StopDBInstance",
-#       "rds:StartDBInstance"
-#     ]
-#     resources = [
-#       "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:db:*"
-#     ]
-#   }
-# }
-
-//Create the IAM policy using the RDS policy document for Extract Lambda
-# resource "aws_iam_policy" "lambda_rds_policy" {
-#   name_prefix = "rds-policy-${var.extract_lambda}"
-#   policy      = data.aws_iam_policy_document.rds_policy_document.json
-# }
-
-
-# Attach the RDS Policy to the Extract lambda Role
-# resource "aws_iam_role_policy_attachment" "lambda_rds_attachment" {
-#   role       = aws_iam_role.extract_lambda_role.name
-#   policy_arn = aws_iam_policy.lambda_rds_policy.arn
-# }
-# 
-
 #####################################################################################################
 #####################################################################################################
 # Transform Lambda Role
@@ -367,8 +327,7 @@ data "aws_iam_policy_document" "cw_document_transform" {
     effect   = "Allow"
     actions  = ["logs:CreateLogStream", "logs:PutLogEvents"]
     resources = [
-      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.transform_lambda}:*",
-      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_cloudwatch_log_group.alapin_extract_log_group.name}:*"
+      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${aws_cloudwatch_log_group.alapin_log_group.name}:*"
     ]
   }
 }
@@ -466,8 +425,7 @@ data "aws_iam_policy_document" "cw_document_load"{
       effect = "Allow"
       actions = ["logs:CreateLogStream","logs:PutLogEvents"]
       resources = [
-        "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.load_lambda}:*",
-        "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${aws_cloudwatch_log_group.alapin_extract_log_group.name}:*"
+        "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${aws_cloudwatch_log_group.alapin_log_group.name}:*"
       ]
     }
 }
@@ -536,7 +494,7 @@ data "aws_iam_policy_document" "secret_manager_document_warehouse"{
       actions = [
         "secretsmanager:GetSecretValue"
       ]
-      resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:totesys-warehouse-ltGoRO"]
+      resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:totesys-warehouse-ltGoRO",]
       effect = "Allow"
       sid = "AllowSecrets"
     }
