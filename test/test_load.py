@@ -49,8 +49,8 @@ def bucket_with_data(s3_client):
 
 class TestSendSNSNotification:
     @pytest.mark.it("test sns logs arn")
-    def test_sns_logs_arn(self, caplog, sns_and_topic):
-        _, topic_arn = sns_and_topic
+    def test_sns_logs_arn(self, caplog, mock_topic):
+        topic_arn = mock_topic.arn
 
         with patch("src.load.SNS_TOPIC_ARN", topic_arn):
             with caplog.at_level(logging.INFO):
@@ -59,8 +59,8 @@ class TestSendSNSNotification:
 
 
     @pytest.mark.it("test sns publishes expected message")
-    def test_sns_publishes_expected_message(self, sns_and_topic, aws_credentials):
-        sns, topic_arn = sns_and_topic
+    def test_sns_publishes_expected_message(self, mock_topic, aws_credentials):
+        topic_arn = mock_topic.arn
         sqs = boto3.client("sqs", region_name="eu-west-2")
         queue = sqs.create_queue(
             QueueName="test-queue",
@@ -70,7 +70,7 @@ class TestSendSNSNotification:
             QueueUrl=queue_url, AttributeNames=["QueueArn"]
         )
         queue_arn = queue_attributes["Attributes"]["QueueArn"]
-        sns.subscribe(TopicArn=topic_arn, Protocol="sqs", Endpoint=queue_arn)
+        mock_topic.subscribe(TopicArn=topic_arn, Protocol="sqs", Endpoint=queue_arn)
 
         test_message = "test_message"
         with patch("src.load.SNS_TOPIC_ARN", topic_arn):
@@ -84,7 +84,7 @@ class TestSendSNSNotification:
         assert message_body["TopicArn"] == topic_arn
 
     @pytest.mark.it("test sns logs error if arn not found")
-    def test_sns_logs_error_if_arn_not_found(self, sns_and_topic, test_arn_var, caplog):
+    def test_sns_logs_error_if_arn_not_found(self, mock_topic, test_arn_var, caplog):
         with caplog.at_level(logging.INFO):
             send_sns_notification("test_message")
             assert "Failed to send SNS notification:" in caplog.text
