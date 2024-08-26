@@ -322,6 +322,7 @@ def warehouse_conn():
 
 @pytest.fixture
 def mock_topic(aws_credentials):
+    load_dotenv()
     with mock_aws():
         sns_resource = boto3.resource(
             "sns",
