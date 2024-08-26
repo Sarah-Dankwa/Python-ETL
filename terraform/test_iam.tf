@@ -117,8 +117,7 @@ data "aws_iam_policy_document" "cloudwatch_sns_policy_document" {
     actions = ["sns:Publish"]
     resources = [
       "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:user-updates-topic",
-      # "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_sns_topic.step_functions_workflow_sns.arn}"
-      "${data.aws_sns_topic.step_functions_workflow_sns.arn}"
+      "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:totesys-workflow-step-functions-notifications"
     ]
   }
 }
@@ -142,6 +141,7 @@ resource "aws_iam_role_policy_attachment" "step_functions_sns_policy_attachment"
   role       = aws_iam_role.state_machine_role.name
   policy_arn = aws_iam_policy.cloudwatch_sns_policy.arn
 }
+
 
 #####################################################################################################
 #####################################################################################################
@@ -518,3 +518,43 @@ resource "aws_iam_role_policy_attachment" "secret_manager_load_policy_attachemen
   
 }
 
+
+# ==========================================
+# SNS Policy for All Lambdas
+# ==========================================
+
+
+# CloudWatch SNS Policy for Notifications
+data "aws_iam_policy_document" "lambda_sns_policy_document" {
+  statement {
+    effect = "Allow"
+    actions = ["sns:Publish"]
+    resources = [
+       "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:totesys-workflow-step-functions-notifications"
+    ]
+  }
+}
+
+
+//Create the IAM policy using the lambda SNS policy document
+resource "aws_iam_policy" "lambda_sns_policy" {
+  name        = "LambdaSNSPolicy"
+  description = "IAM policy to allow Lambda to publish to the state machine sns topic"
+  policy = data.aws_iam_policy_document.lambda_sns_policy_document.json
+}
+
+# Attach the Policy to the Lambda roles
+resource "aws_iam_role_policy_attachment" "extract_lambda_sns_policy_attachment" {
+  role       = aws_iam_role.extract_lambda_role.name
+  policy_arn = aws_iam_policy.lambda_sns_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "transform_lambda_lambda_sns_policy_attachment" {
+  role       = aws_iam_role.transform_lambda_role.name
+  policy_arn = aws_iam_policy.lambda_sns_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "load_lambda_sns_policy_attachment" {
+  role       = aws_iam_role.load_lambda_role.name
+  policy_arn = aws_iam_policy.lambda_sns_policy.arn
+}
