@@ -149,6 +149,7 @@ resource "aws_iam_role_policy_attachment" "step_functions_sns_policy_attachment"
 
 resource "aws_iam_role" "extract_lambda_role" {
   name_prefix = "role-${var.extract_lambda}"
+  force_detach_policies = true
   assume_role_policy = <<EOF
   {
     "Version": "2012-10-17",
@@ -295,6 +296,7 @@ resource "aws_iam_role_policy_attachment" "ssm_policy_attachment_extract" {
 // Creating a terraform IAMS role for transform Lambda
 resource "aws_iam_role" "transform_lambda_role" {
     name_prefix = "role-${var.transform_lambda}"
+    force_detach_policies = true
     assume_role_policy = <<EOF
     {
         "Version": "2012-10-17",
@@ -393,6 +395,7 @@ resource "aws_iam_role_policy_attachment" "s3_policy_attachment_transform" {
 // Creating a terraform IAMS role for the Load lambda function
 resource "aws_iam_role" "load_lambda_role" {
     name_prefix = "role-${var.load_lambda}"
+    force_detach_policies = true
     assume_role_policy = <<EOF
     {
         "Version": "2012-10-17",
