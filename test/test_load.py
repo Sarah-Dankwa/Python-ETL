@@ -49,20 +49,20 @@ def bucket_with_data(s3_client):
 
 class TestSendSNSNotification:
     @pytest.mark.it("test sns logs arn")
-    def test_sns_logs_arn(self, caplog, sns_and_topic, aws_credentials):
+    def test_sns_logs_arn(self, caplog, aws_credentials):
         with mock_aws():
             client = boto3.client("sns", region_name="eu-west-2")
             test_topic = client.create_topic(Name="test-topic")
             topic_arn = test_topic["TopicArn"]
-            yield client, topic_arn
-            _, topic_arn = sns_and_topic
+            # yield client, topic_arn
+            # _, topic_arn = sns_and_topic
 
             with patch("src.load.SNS_TOPIC_ARN", topic_arn):
                 with caplog.at_level(logging.INFO):
                     send_sns_notification("test_message")
                     assert f"SNS_TOPIC_ARN: {topic_arn}" in caplog.text
 
-    @mock_aws
+
     @pytest.mark.it("test sns publishes expected message")
     def test_sns_publishes_expected_message(self, sns_and_topic, aws_credentials):
         sns, topic_arn = sns_and_topic

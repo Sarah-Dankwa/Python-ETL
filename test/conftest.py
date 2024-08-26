@@ -326,9 +326,13 @@ def sns_and_topic(aws_credentials):
         client = boto3.client(
             "sns",
             region_name="eu-west-2",
-            aws_access_key_id="test",
-            aws_secret_access_key="test",
+            aws_access_key_id='testing',
+            aws_secret_access_key= 'testing'
         )
-        test_topic = client.create_topic(Name="test-topic")
+        test_topic = client.create_topic(
+            Name="test-topic",
+            aws_access_key_id='testing',
+            aws_secret_access_key= 'testing'
+        )
         topic_arn = test_topic["TopicArn"]
         yield client, topic_arn
