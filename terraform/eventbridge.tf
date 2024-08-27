@@ -13,7 +13,7 @@ module "eventbridge" {
   targets = {
     crons = [
       {
-        name            = var.state_machine_name //need state machine name
+        name            = "${var.state_machine_name}" 
         arn             = "arn:aws:states:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:stateMachine:${var.state_machine_name}"
         attach_role_arn = true
       }

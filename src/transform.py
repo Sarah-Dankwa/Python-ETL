@@ -1,4 +1,3 @@
-
 from botocore.exceptions import ClientError
 import boto3
 import json
@@ -118,8 +117,12 @@ def fact_sales_order(sales_order_df):
         ]
         fact_sales_order_df["created_date"] = fact_sales_order_df["created_at"].dt.date
         fact_sales_order_df["created_time"] = fact_sales_order_df["created_at"].dt.time
-        fact_sales_order_df["last_updated_date"] = fact_sales_order_df["last_updated"].dt.date
-        fact_sales_order_df["last_updated_time"] = fact_sales_order_df["last_updated"].dt.time
+        fact_sales_order_df["last_updated_date"] = fact_sales_order_df[
+            "last_updated"
+        ].dt.date
+        fact_sales_order_df["last_updated_time"] = fact_sales_order_df[
+            "last_updated"
+        ].dt.time
         df = fact_sales_order_df.drop(["created_at", "last_updated"], axis=1)
         df.rename(columns={"staff_id": "sales_staff_id"}, inplace=True)
         return df
@@ -297,10 +300,12 @@ def lambda_handler(event=None, context=None):
     try:
         file_path_list = []
         client = boto3.client("s3")
-        date_objects = client.list_objects_v2(Bucket=TRANSFORM_BUCKET_NAME, Prefix="dim_date")
+        date_objects = client.list_objects_v2(
+            Bucket=TRANSFORM_BUCKET_NAME, Prefix="dim_date"
+        )
         bucket_objects = client.list_objects_v2(Bucket=TRANSFORM_BUCKET_NAME)
         if bucket_objects["KeyCount"] == 0:
-            
+
             # creation of dimension location
             location_files = get_all_files("address")
             location_df = read_parquet_from_s3(location_files)
@@ -415,4 +420,3 @@ def lambda_handler(event=None, context=None):
             return file_path_list
     except Exception as e:
         logger.error(f"Error{e} Transform lambda failed to complete")
-

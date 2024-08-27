@@ -118,7 +118,9 @@ class TestGetSingleTable:
             assert row["last_updated"] > sample_date
 
     @pytest.mark.it("logs error if table not found")
-    def test_logs_error_with_invalid_table(self, caplog, secretsmanager_client, oltp_db):
+    def test_logs_error_with_invalid_table(
+        self, caplog, secretsmanager_client, oltp_db
+    ):
         with caplog.at_level(logging.INFO):
             get_single_table("table_not_in_db")
             assert 'relation "table_not_in_db" does not exist' in caplog.text

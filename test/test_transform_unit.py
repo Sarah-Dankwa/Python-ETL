@@ -124,7 +124,6 @@ class TestWriteParquteToS3:
         df = read_parquet_from_s3(keys)
         key = write_parquet_to_s3_bucket(df, "sales_order")
         assert key == "sales_order/2024/08/20/05:05:05/sales_order.parquet"
-        
 
     @pytest.mark.it(
         "Testing write_parquet_to_s3_bucket writing parqet file to not existing S3 bucket"
@@ -145,7 +144,7 @@ class TestWriteParquteToS3:
 @patch("src.transform.INGEST_BUCKET_NAME", "test-ingestion-bucket")
 class TestRemodellingSalesOrder:
     @pytest.mark.it("Testing remodelling sales order fact table")
-    def test_remodelling_sales_order_fact_table(self,transform_s3_client):
+    def test_remodelling_sales_order_fact_table(self, transform_s3_client):
         keys = ["sales_order/2024/08/19/23:17:17/sales_order.parquet"]
         df = read_parquet_from_s3(keys)
         fact_sales_order_df = fact_sales_order(df)
@@ -350,15 +349,16 @@ class TestRemodellingLocation:
 
 
 @patch("src.transform.INGEST_BUCKET_NAME", "test-ingestion-bucket")
-class TestLambdaHandler:    
-    
+class TestLambdaHandler:
     @pytest.mark.it("Testing Lambda Handler table")
     @patch("src.transform.TRANSFORM_BUCKET_NAME", "test-transformation-bucket-empty")
     @patch("src.transform.year", "2024")
     @patch("src.transform.month", "08")
     @patch("src.transform.day", "21")
     @patch("src.transform.time", "01:01:01")
-    def test_lambda_handler_full_load(self, transform_s3_client_mock_empty_transform_bucket):
+    def test_lambda_handler_full_load(
+        self, transform_s3_client_mock_empty_transform_bucket
+    ):
         events = [
             "sales_order/2024/08/19/23:17:17/sales_order.parquet",
             "location/2024/08/19/23:17:17/location.parquet",
@@ -376,11 +376,12 @@ class TestLambdaHandler:
             "dim_currency/2024/08/21/01:01:01/dim_currency.parquet",
             "dim_design/2024/08/21/01:01:01/dim_design.parquet",
             "dim_date/2024/08/21/01:01:01/dim_date.parquet",
-            "fact_sales_order/2024/08/21/01:01:01/fact_sales_order.parquet"
+            "fact_sales_order/2024/08/21/01:01:01/fact_sales_order.parquet",
         ]
-    
 
-    @pytest.mark.it("Testing Lambda handler to write empty event file list to S3 bucket")
+    @pytest.mark.it(
+        "Testing Lambda handler to write empty event file list to S3 bucket"
+    )
     @patch("src.transform.TRANSFORM_BUCKET_NAME", "test-transformation-bucket")
     def test_writing_empty_list_to_s3(self, caplog, transform_s3_client):
         keys = []
