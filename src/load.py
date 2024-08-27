@@ -15,9 +15,7 @@ SNS_TOPIC_ARN = os.environ["SNS_TOPIC_ARN"]
 logger = logging.getLogger()
 logging.getLogger().setLevel(logging.INFO)
 
-sns_client = boto3.client("sns")
-# SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:590183674561:totesys-workflow-step-functions-notifications"
-# SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:026090521693:totesys-workflow-step-functions-notifications"
+sns_client = boto3.client("sns", region_name="eu-west-2")
 
 
 def send_sns_notification(message: str):
@@ -53,6 +51,12 @@ def format_error_message(error):
 
 
 def get_warehouse_credentials() -> dict:
+    """returns credentials for the data warehouse as dictionary
+
+    Retuns:
+        dictionary of aws credentials to access the data warehouse
+    """
+
     secret_name = "totesys-warehouse"
     client = boto3.client("secretsmanager")
     try:
@@ -65,7 +69,6 @@ def get_warehouse_credentials() -> dict:
             logger.error(error_msg)
 
             send_sns_notification(error_msg)
-
             raise
 
 
@@ -73,28 +76,33 @@ def db_connection() -> Connection:
     """This function connects to the data warehouse hosted in the cloud
     using the credentials stored in aws.
     It logs an error if the connection fails."""
-
-
-def db_connection() -> Connection:
     try:
         secret = get_warehouse_credentials()
         return Connection(
-            user=secret["Username"],
-            database=secret["Database"],
-            password=secret["Password"],
-            host=secret["Hostname"],
-            port=secret["Port"],
+            user=secret["POSTGRES_USERNAME"],
+            database=secret["POSTGRES_DATABASE"],
+            password=secret["POSTGRES_PASSWORD"],
+            host=secret["POSTGRES_HOSTNAME"],
+            port=secret["POSTGRES_PORT"],
         )
     except InterfaceError as e:
         error_msg = f"No connection to database - please check: {e}"
         logger.error(error_msg)
 
         send_sns_notification(error_msg)
-
         raise
 
 
 def get_latest_data_for_one_table(object_key: str) -> pd.DataFrame:
+    """reads parquet file at given key and returns dataframe
+
+    Args:
+        object_key(string): key of a parquet file in transform bucket
+
+    Returns:
+        dataframe with data from table
+    """
+
     s3 = boto3.client("s3")
     try:
         obj = s3.get_object(Bucket=BUCKET_NAME, Key=object_key)
@@ -109,27 +117,48 @@ def get_latest_data_for_one_table(object_key: str) -> pd.DataFrame:
         )
 
         send_sns_notification(detailed_message)
-
         raise
 
 
 def insert_new_data_into_data_warehouse(df: pd.DataFrame, table_name: str):
-    query = f"INSERT INTO {identifier(table_name)} ("
-    query += ", ".join([identifier(col) for col in df.columns])
-    query += ") VALUES "
+    """inserts data from dataframe into a table in the data warehouse
 
+    Args:
+        data(dict): dataframe of data to be inserted into the warehouse
+        table_name(str): the table name
+
+    """
+    # converts list of columns to string list - col, col col
+    # identifier used to prevent sql injection for column & table names
+    column_names = ", ".join([identifier(col) for col in df.columns])
+
+    # (value, value, value) for each value
+    # literal used to prevent sql injection for values
     insert_list = []
     for row in df.values:
         row_query = "(" + ", ".join([literal(value) for value in row]) + ")"
         insert_list.append(row_query)
-    query += ", ".join(insert_list) + ";"
 
+    # build insert query
+    query = f"INSERT INTO {identifier(table_name)} ({column_names}) VALUES "
+    query += ", ".join(insert_list)
+
+    # for dimension tables add rule for how to handle duplicate data
+    if table_name != "fact_sales_order":
+        p_key = table_name[4:] + "_id"
+        update_query = [
+            f"{identifier(col)} = EXCLUDED.{identifier(col)}" for col in df.columns
+        ]
+        # update values in table if given record with the same primary key
+        query += f" ON CONFLICT ({p_key}) DO UPDATE SET "
+        query += ", ".join(update_query)
+
+    query += ";"
     conn = None
-
     try:
         conn = db_connection()
         conn.run(query)
-    except (DatabaseError, AttributeError) as e:
+    except (DatabaseError, AttributeError, ClientError) as e:
         error_msg = f"Cannot add data to the database: {e}"
         logger.error(error_msg)
         detailed_message = (
@@ -145,23 +174,15 @@ def insert_new_data_into_data_warehouse(df: pd.DataFrame, table_name: str):
 
 
 def lambda_handler(event: list, context):
-    """Lambda handler to add data from S3 parquet files to data warehouse"""
-    # for key in event:
-    #     try:
-    #         df = get_latest_data_for_one_table(key)
-    #         if df is not None:
-    #             table_name = key.split('/')[0]
-    #             insert_new_data_into_data_warehouse(df, table_name)
-    #     except Exception as e:
-    #         # Ensure the Step Function gets an error response to handle it
-    #         error_msg = f"Error processing key: {key}. Exception: {e}"
-    #         logger.error(error_msg)
+    """adds data from new parquet files in transform bucket to data warehouse
 
-    #         detailed_message = f"{error_msg}\nStack Trace: {traceback.format_exc()}"
+    Args:
+        event(list) - list of keys of parquet files in transform bucket
+        context(json dict) - not used
 
-    #         send_sns_notification(detailed_message)
-
-    #         raise  # Re-raise the exception for Step Function to catch it
+    loops through all new parquet files in transform s3 and inserts data into
+    corresponding table in the data warehouse.
+    """
 
     try:
         for key in event:
@@ -169,6 +190,10 @@ def lambda_handler(event: list, context):
             if df is not None:
                 table_name = key.split("/")[0]
                 insert_new_data_into_data_warehouse(df, table_name)
+                logger.info(
+                    f"Data added to the {table_name} table in the data warehouse."
+                )
+
     except Exception as e:
         error_details = {
             "errorMessage": str(e),
@@ -177,9 +202,8 @@ def lambda_handler(event: list, context):
         }
 
         formatted_message = format_error_message(error_details)
-        logging.error(formatted_message)
+        logger.error(formatted_message)
 
         # Send formatted error message to SNS
         send_sns_notification(json.dumps(formatted_message))
-
         raise

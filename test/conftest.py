@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 import json
 from db.connection import connect_to_db
 from unittest.mock import patch
-from datetime import datetime
 from db.seed import seed_warehouse
 
 
@@ -31,12 +30,6 @@ def environment_variables():
     """load environment variables from env"""
     load_dotenv()
     yield
-
-
-@pytest.fixture
-def now_variable():
-    with patch.object("src.extract.now", datetime(2024, 10, 15, 20, 25)) as dt:
-        yield dt
 
 
 @pytest.fixture
@@ -90,7 +83,7 @@ def s3_client(aws_credentials):
         yield client
 
 
-""" 
+"""
 Mocking an extract and tranform buckets to test extract and tranform functionality. Also mocking few files adding to extract bucket to read based on the requirements in the testcases.
 Mocking transform bucket files to write parquet based on the requirement of a testcases
 """
@@ -192,7 +185,7 @@ def transform_s3_client(aws_credentials):
         yield client
 
 
-""" 
+"""
 Mocking an empty tranform bucket and a filled ingestion bucket to test the full load transform functionality
 """
 
@@ -310,7 +303,7 @@ def invalid_warehouse_credentials(secretsmanager_client_test):
 
 
 @pytest.fixture
-def conn():
+def warehouse_conn():
     """connects to local database & adds empty tables
 
     yields a connection to the local database
@@ -325,3 +318,15 @@ def conn():
     finally:
         if db:
             db.close()
+
+
+@pytest.fixture
+def mock_topic(aws_credentials):
+    load_dotenv()
+    with mock_aws():
+        sns_resource = boto3.resource(
+            "sns",
+            region_name = 'eu-west-2'
+        )
+        topic = sns_resource.create_topic(Name='test-topic')
+        yield topic
