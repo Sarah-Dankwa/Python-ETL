@@ -26,6 +26,7 @@ jobs:
       env:
         DATA_INGESTED_BUCKET_NAME: test-ingestion-bucket
         DATA_PROCESSED_BUCKET_NAME: test-processed-bucket
+        SNS_TOPIC_ARN: test-arn
         # environment vars for local database on virtual machine
         LOCAL_USER: postgres
         LOCAL_PASSWORD: postgres
@@ -51,6 +52,10 @@ jobs:
         
         - name: Run Dev-Setup
           run: make dev-setup
+        # add fake aws credentials
+        - name: set-up test aws credentials
+          run: mkdir ~/.aws && touch ~/.aws/credentials && echo -e "[default]\naws_access_key_id = test\naws_secret_access_key = test" > ~/.aws/credentials
+
         - name: Run Tests
           run: make run-checks
         
