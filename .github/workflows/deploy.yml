@@ -52,9 +52,9 @@ jobs:
         
         - name: Run Dev-Setup
           run: make dev-setup
-        # # add fake aws credentials
-        # - name: set-up test aws credentials
-        #   run: make credentials
+        # add fake aws credentials
+        - name: set-up test aws credentials
+          run: mkdir ~/.aws && touch ~/.aws/credentials && echo -e "[default]\naws_access_key_id = test\naws_secret_access_key = test" > ~/.aws/credentials
 
         - name: Run Tests
           run: make run-checks
