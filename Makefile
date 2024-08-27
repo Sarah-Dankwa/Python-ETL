@@ -142,7 +142,7 @@ credentials:
 	$(mkdir ~/.aws && touch ~/.aws/credentials && echo -e "[default]\naws_access_key_id = test\naws_secret_access_key = test" > ~/.aws/credentials)
 
 ## Run the unit tests
-unit-test: setup-db
+unit-test: setup-db credentials
 	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -vvvrP \
 	--ignore=dependencies/python/ \
 	--testdox)

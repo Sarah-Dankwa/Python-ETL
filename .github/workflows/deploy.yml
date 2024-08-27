@@ -52,9 +52,9 @@ jobs:
         
         - name: Run Dev-Setup
           run: make dev-setup
-
-        - name: set-up test aws credentials
-          run: make credentials
+        # # add fake aws credentials
+        # - name: set-up test aws credentials
+        #   run: make credentials
 
         - name: Run Tests
           run: make run-checks
