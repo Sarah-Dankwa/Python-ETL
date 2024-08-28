@@ -6,7 +6,6 @@ import logging
 from decimal import Decimal
 from datetime import date, time
 from botocore.exceptions import ClientError
-from moto import mock_aws
 import boto3
 import json
 from pg8000.exceptions import InterfaceError, DatabaseError
