@@ -4,7 +4,7 @@
 #
 #################################################################################
 
-PROJECT_NAME = password_manager
+PROJECT_NAME = DE-ALAPIN-TOTESYS
 REGION = eu-west-2
 PYTHON_INTERPRETER = python3
 WD=$(shell pwd)
