@@ -18,7 +18,7 @@ Add following secrets to github secrets
 
 |Secret|Value|
 |------|-----|
-AWS_ACCESS_KEY_ID|aws secret access key OD
+AWS_ACCESS_KEY_ID|aws secret access key
 AWS_SECRET_ACCESS_KEY|aws secret access key
 AWS_REGION|aws default region
 
@@ -122,7 +122,7 @@ LOCAL_HOST=localhost
 LOCAL_PORT=5432
 DATA_INGESTED_BUCKET_NAME=test-ingestion-bucket
 DATA_PROCESSED_BUCKET_NAME=test-processed-bucket
-SNS_TOPIC_ARN: test-arn
+SNS_TOPIC_ARN=test-arn
 ```
 
 then run the following command
