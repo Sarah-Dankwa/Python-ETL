@@ -18,7 +18,7 @@ Add following secrets to github secrets
 
 |Secret|Value|
 |------|-----|
-AWS_ACCESS_KEY_ID|aws secret access key OD
+AWS_ACCESS_KEY_ID|aws secret access key
 AWS_SECRET_ACCESS_KEY|aws secret access key
 AWS_REGION|aws default region
 
